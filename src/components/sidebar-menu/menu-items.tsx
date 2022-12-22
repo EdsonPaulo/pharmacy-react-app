@@ -1,6 +1,7 @@
-import { FiGrid, FiUsers, FiList, FiSettings } from 'react-icons/fi';
+import { FiGrid, FiUsers, FiSettings } from 'react-icons/fi';
 import { GrUserSettings, GrGroup } from 'react-icons/gr';
 import { BsCardChecklist } from 'react-icons/bs';
+import { ROUTES } from '../../constants/routes';
 
 export const AdminMenu = [
   {
@@ -8,22 +9,22 @@ export const AdminMenu = [
     children: [
       {
         title: 'dashboard',
-        path: '/dashboard',
+        path: ROUTES.Dashboard,
         icon: FiGrid,
       },
       {
         title: 'encomendas',
-        path: '/encomendas',
+        path: ROUTES.Orders,
         icon: BsCardChecklist,
       },
       {
         title: 'Clientes',
-        path: '/clientes',
+        path: ROUTES.Customers,
         icon: GrGroup,
       },
       {
         title: 'Funcionários',
-        path: '/funcionarios',
+        path: ROUTES.Employees,
         icon: FiUsers,
       },
     ],
@@ -33,12 +34,12 @@ export const AdminMenu = [
     children: [
       {
         title: 'Utilizadores',
-        path: '/preferencias/utilizadores',
+        path: ROUTES.Users,
         icon: GrUserSettings,
       },
       {
-        title: 'Definições',
-        path: '/preferencias/definicoes',
+        title: 'Configurações',
+        path: ROUTES.Settings,
         icon: FiSettings,
       },
     ],

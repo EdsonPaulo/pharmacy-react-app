@@ -1,10 +1,6 @@
-import { Box, Flex } from '@chakra-ui/react';
-import { useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Box } from '@chakra-ui/react';
 
 export const CustomersPage = () => {
-  const { pathname } = useLocation();
-
   return (
     <Box flex={1}>
       <Box />

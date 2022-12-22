@@ -6,20 +6,13 @@ export const SidebarMenu = () => {
   const { pathname } = useLocation();
 
   return (
-    <Box
-      p={10}
-      pr={0}
-      width={280}
-      height="100vh"
-      textColor="white"
-      bgColor="brand.primary"
-    >
-      <Box mr={6} mb={20}>
-        <Image src="/farm-gest-logo.png" alt="farm gest logo" />
-      </Box>
+    <Box width={280} height="100vh" textColor="white" bgColor="brand.primary">
+      <Flex mb={12} justifyContent="center" p={10}>
+        <Image src="/farm-gest-logo.svg" alt="farm gest logo" />
+      </Flex>
 
       {AdminMenu.map((item) => (
-        <Box key={item.title} mb={12}>
+        <Box key={item.title} mb={12} pl={10}>
           <Text
             mb={3}
             fontWeight="bold"
