@@ -14,6 +14,7 @@ export const SidebarMenu = () => {
       textColor="white"
       bgColor="brand.primary"
       flexDirection="column"
+      position="fixed"
       justifyContent="space-between"
     >
       <Box>

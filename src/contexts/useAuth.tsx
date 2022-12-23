@@ -44,7 +44,7 @@ export const AuthProvider = (props: any) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const [user, setUser] = useState<any>({});
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
   const [formData, setFormData] = useState<TFormData>({
     name: '',
     email: '',
