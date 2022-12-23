@@ -25,7 +25,7 @@ export const UsersList = () => {
   const { data, isLoading } = useQuery('users', getUsers);
 
   const isEmpty = useMemo(
-    () => !isLoading && (!data || data?.length === 0),
+    () => !(!isLoading && (!data || data?.length === 0)),
     [isLoading, data],
   );
 

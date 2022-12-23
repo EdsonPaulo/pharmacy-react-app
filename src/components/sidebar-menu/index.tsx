@@ -62,7 +62,7 @@ export const SidebarMenu = () => {
                   <Icon mr={3} as={menuItem.icon} boxSize={5} color="white" />
                   <Text
                     fontWeight="600"
-                    fontSize={16}
+                    fontSize={14}
                     letterSpacing={1.1}
                     textTransform={'capitalize'}
                   >

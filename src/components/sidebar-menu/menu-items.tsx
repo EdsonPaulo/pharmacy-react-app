@@ -1,5 +1,6 @@
 import { BsCardChecklist } from 'react-icons/bs';
 import { FiBriefcase, FiGrid, FiSettings, FiUsers } from 'react-icons/fi';
+import { GiPill } from 'react-icons/gi';
 import { ROUTES } from '../../constants/routes';
 
 export const AdminMenu = [
@@ -15,6 +16,11 @@ export const AdminMenu = [
         title: 'encomendas',
         path: ROUTES.Orders,
         icon: BsCardChecklist,
+      },
+      {
+        title: 'produtos',
+        path: ROUTES.Products,
+        icon: GiPill,
       },
       {
         title: 'Clientes',

@@ -9,6 +9,7 @@ import { CustomersPage } from '../pages/customers';
 import { DashboardPage } from '../pages/dashboard';
 import { EmployeesPage } from '../pages/employees';
 import { OrdersPage } from '../pages/orders';
+import { ProductsPage } from '../pages/products';
 import { UsersPage } from '../pages/users';
 import { SettingsPage } from '../pages/settings';
 
@@ -16,6 +17,7 @@ export const AuthenticatedRoutes = () => (
   <Routes>
     <Route path={ROUTES.Dashboard} element={<DashboardPage />} />
     <Route path={ROUTES.Orders} element={<OrdersPage />} />
+    <Route path={ROUTES.Products} element={<ProductsPage />} />
     <Route path={ROUTES.Customers} element={<CustomersPage />} />
     <Route path={ROUTES.Employees} element={<EmployeesPage />} />
     <Route path={ROUTES.Users} element={<UsersPage />} />

@@ -5,6 +5,7 @@ export const ROUTES = {
   Customers: '/clientes',
   Employees: '/funcionarios',
   Orders: '/encomendas',
+  Products: '/produtos',
 
   Users: '/preferencias/utilizadores',
   Settings: '/preferencias/configuracoes',
