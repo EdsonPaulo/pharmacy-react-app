@@ -21,7 +21,7 @@ export const SignInPage = () => {
 
   return (
     <Flex minHeight="100vh" bg="brand.primary">
-      <Box flex={1} display={{ xs: 'none', md: 'block' }}>
+      <Box flex={1} p={4} display={{ base: 'none', md: 'block' }}>
         <Box
           h="100vh"
           display="flex"
@@ -32,7 +32,12 @@ export const SignInPage = () => {
         </Box>
       </Box>
 
-      <Flex bg="white" flex={0.5} p={20} alignItems="center">
+      <Flex
+        bg="white"
+        flex={{ base: 1, md: 0.5 }}
+        p={{ base: 5, md: 10, lg: 20 }}
+        alignItems="center"
+      >
         <Box w="100%">
           <Text fontSize="2xl" as="b">
             Entrar agora na conta

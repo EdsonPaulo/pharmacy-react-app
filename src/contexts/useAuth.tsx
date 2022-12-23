@@ -121,10 +121,11 @@ export const AuthProvider = (props: any) => {
   }, []);
 
   useEffect(() => {
-    console.log(pathname);
-
     if (!isLoggedIn && !Object.values(AUTH_ROUTES).includes(pathname)) {
       navigate(AUTH_ROUTES.AuthSignIn);
+    }
+    if (isLoggedIn && Object.values(AUTH_ROUTES).includes(pathname)) {
+      navigate(ROUTES.Dashboard);
     }
   }, []);
 

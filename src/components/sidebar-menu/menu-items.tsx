@@ -1,6 +1,5 @@
-import { FiGrid, FiUsers, FiSettings } from 'react-icons/fi';
-import { GrUserSettings, GrGroup } from 'react-icons/gr';
 import { BsCardChecklist } from 'react-icons/bs';
+import { FiBriefcase, FiGrid, FiSettings, FiUsers } from 'react-icons/fi';
 import { ROUTES } from '../../constants/routes';
 
 export const AdminMenu = [
@@ -20,12 +19,12 @@ export const AdminMenu = [
       {
         title: 'Clientes',
         path: ROUTES.Customers,
-        icon: GrGroup,
+        icon: FiUsers,
       },
       {
         title: 'Funcionários',
         path: ROUTES.Employees,
-        icon: FiUsers,
+        icon: FiBriefcase,
       },
     ],
   },
@@ -35,7 +34,7 @@ export const AdminMenu = [
       {
         title: 'Utilizadores',
         path: ROUTES.Users,
-        icon: GrUserSettings,
+        icon: FiUsers,
       },
       {
         title: 'Configurações',

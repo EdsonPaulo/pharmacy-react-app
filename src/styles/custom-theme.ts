@@ -11,8 +11,8 @@ const CustomTheme = extendTheme({
     },
   },
   fonts: {
-    heading: 'Roboto Slab',
-    body: 'Roboto Slab',
+    heading: 'Poppins',
+    body: 'Poppins',
   },
 });
 export default CustomTheme;

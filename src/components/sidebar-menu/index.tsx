@@ -15,10 +15,11 @@ export const SidebarMenu = () => {
         <Box key={item.title} mb={12} pl={10}>
           <Text
             mb={3}
-            fontWeight="bold"
-            fontSize={13}
+            fontSize={14}
             textTransform="uppercase"
-            letterSpacing={1.1}
+            fontFamily="Roboto"
+            fontWeight="900"
+            letterSpacing={1.2}
           >
             {item.title}
           </Text>
@@ -54,7 +55,7 @@ export const SidebarMenu = () => {
                 />
 
                 <Text
-                  fontWeight="bold"
+                  fontWeight="600"
                   fontSize={16}
                   letterSpacing={1.1}
                   textTransform={'capitalize'}

@@ -1,4 +1,6 @@
 import '@fontsource/roboto-slab';
+import '@fontsource/roboto';
+import '@fontsource/poppins';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
