@@ -25,6 +25,7 @@ interface TAuthContextData {
   user: any;
   handleSignIn: () => void;
   handleSignUp: () => void;
+  handleLogout: () => void;
   handleChangeFormData: (args: Partial<TFormData>) => void;
 }
 
@@ -43,7 +44,7 @@ export const AuthProvider = (props: any) => {
   const toast = useToast();
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const [user, setUser] = useState<any>({});
+  const [user, setUser] = useState<any>(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [formData, setFormData] = useState<TFormData>({
     name: '',
@@ -59,6 +60,12 @@ export const AuthProvider = (props: any) => {
     postSignUp,
   );
 
+  const handleLogout = useCallback(() => {
+    setUser(null);
+    setIsLoggedIn(false);
+    navigate(AUTH_ROUTES.AuthSignIn);
+  }, [navigate]);
+
   const handleSignIn = useCallback(() => {
     mutateSignIn(formData, {
       onSuccess: (res) => {
@@ -71,6 +78,7 @@ export const AuthProvider = (props: any) => {
           status: 'success',
           title: 'Login efectuado com sucesso!',
         });
+        navigate(ROUTES.Dashboard);
       },
       onError: () => {
         toast({
@@ -82,11 +90,7 @@ export const AuthProvider = (props: any) => {
         });
       },
     });
-
-    // delete when api is ready
-    navigate(ROUTES.Dashboard);
-    setIsLoggedIn(true);
-  }, [mutateSignIn]);
+  }, [formData, mutateSignIn, navigate, toast]);
 
   const handleSignUp = useCallback(() => {
     mutateSignUp(formData, {
@@ -100,6 +104,7 @@ export const AuthProvider = (props: any) => {
           status: 'success',
           title: 'Conta criada com sucesso!',
         });
+        navigate(ROUTES.Dashboard);
       },
       onError: () => {
         toast({
@@ -111,10 +116,7 @@ export const AuthProvider = (props: any) => {
         });
       },
     });
-
-    // delete when api is ready
-    setIsLoggedIn(true);
-  }, [mutateSignUp]);
+  }, [formData, mutateSignUp, navigate, toast]);
 
   const handleChangeFormData = useCallback((args: Partial<TFormData>) => {
     setFormData((prev) => ({ ...prev, ...args }));
@@ -127,7 +129,7 @@ export const AuthProvider = (props: any) => {
     if (isLoggedIn && Object.values(AUTH_ROUTES).includes(pathname)) {
       navigate(ROUTES.Dashboard);
     }
-  }, []);
+  }, [navigate, pathname]);
 
   const memoizedValue = useMemo(
     () => ({
@@ -137,6 +139,7 @@ export const AuthProvider = (props: any) => {
       isLoading: isLoadingSignIn || isLoadingSignUp,
       handleSignIn,
       handleSignUp,
+      handleLogout,
       handleChangeFormData,
     }),
     [
@@ -147,6 +150,7 @@ export const AuthProvider = (props: any) => {
       isLoadingSignUp,
       handleSignIn,
       handleSignUp,
+      handleLogout,
       handleChangeFormData,
     ],
   );

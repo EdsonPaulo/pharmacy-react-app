@@ -20,10 +20,10 @@ export const SignUpPage = () => {
   const { handleSignUp, isLoading, formData, handleChangeFormData } = useAuth();
 
   return (
-    <Flex minHeight="100vh" bg="brand.primary">
+    <Flex minH="100vh" bg="brand.primary">
       <Box flex={1} display={{ xs: 'none', md: 'block' }}>
         <Box
-          h="100vh"
+          minH="100%"
           display="flex"
           alignItems="center"
           justifyContent="center"

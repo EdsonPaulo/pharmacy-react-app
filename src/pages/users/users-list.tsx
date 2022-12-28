@@ -21,11 +21,17 @@ import { FiPlus } from 'react-icons/fi';
 import { getUsers } from '../../services/users';
 import { useMemo } from 'react';
 
+const UserTypesMap: Record<string, string> = {
+  customer: 'Cliente',
+  admin: 'Administrador',
+  employee: 'Funcionário',
+};
+
 export const UsersList = () => {
   const { data, isLoading } = useQuery('users', getUsers);
 
   const isEmpty = useMemo(
-    () => !(!isLoading && (!data || data?.length === 0)),
+    () => !isLoading && (!data || data?.length === 0),
     [isLoading, data],
   );
 
@@ -85,36 +91,14 @@ export const UsersList = () => {
                   </Th>
                 ) : (
                   <Tbody>
-                    <Tr>
-                      <Td>1</Td>
-                      <Td>Edson Paulo</Td>
-                      <Td>edsonpaulo24@gmail.com</Td>
-                      <Td>Administrador</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>2</Td>
-                      <Td>Hélio Swing</Td>
-                      <Td>centimetres (cm)</Td>
-                      <Td>Cliente</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>3</Td>
-                      <Td>Elias Samu-Samu</Td>
-                      <Td>eliassamu@outlook.com</Td>
-                      <Td>Funcionário</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>4</Td>
-                      <Td>Jairo Loureiro</Td>
-                      <Td>jairo2022@gmail.com</Td>
-                      <Td>Cliente</Td>
-                    </Tr>
-                    <Tr>
-                      <Td>5</Td>
-                      <Td>Aminildo Zimbekwe</Td>
-                      <Td>aminildo@hotmail.com</Td>
-                      <Td>Funcionário</Td>
-                    </Tr>
+                    {data?.map((u: any) => (
+                      <Tr key={u.pk_user}>
+                        <Td>{u.pk_user}</Td>
+                        <Td>{(u?.customer || u?.employee)?.name}</Td>
+                        <Td>{u.email}</Td>
+                        <Td>{UserTypesMap[u.user_type]}</Td>
+                      </Tr>
+                    ))}
                   </Tbody>
                 )}
 
@@ -123,9 +107,11 @@ export const UsersList = () => {
                     <Tfoot>
                       <Box />
                     </Tfoot>
-                    <TableCaption pb={6}>
-                      Tabela de utilizadores no sistema
-                    </TableCaption>
+                    {data.length > 5 && (
+                      <TableCaption mt={4} pb={6}>
+                        Tabela de utilizadores no sistema
+                      </TableCaption>
+                    )}
                   </>
                 )}
               </Table>

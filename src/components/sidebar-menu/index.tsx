@@ -3,9 +3,11 @@ import { AdminMenu } from './menu-items';
 import { AiOutlinePoweroff } from 'react-icons/ai';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import { useAuth } from '../../contexts/useAuth';
 
 export const SidebarMenu = () => {
   const { pathname } = useLocation();
+  const { handleLogout } = useAuth();
 
   return (
     <Flex
@@ -80,6 +82,7 @@ export const SidebarMenu = () => {
         ml={10}
         cursor="pointer"
         _hover={{ textDecor: 'underline' }}
+        onClick={() => handleLogout()}
       >
         <Icon mr={3} boxSize={5} color="white" as={AiOutlinePoweroff} />
         <Text fontWeight="600" fontSize={16} letterSpacing={1.1}>

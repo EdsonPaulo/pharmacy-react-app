@@ -5,9 +5,10 @@ import { UsersList } from './users-list';
 export const UsersPage = () => {
   return (
     <Box flex={1} p={10}>
-      <Box />
+      <UsersList />
 
-      <Tabs isFitted isLazy variant="enclosed-colored" colorScheme="teal">
+      {/**
+      * <Tabs isFitted isLazy variant="enclosed-colored" colorScheme="teal">
         <TabList borderBottom="none">
           <Tab>Utilizadores</Tab>
           <Tab>Tipos</Tab>
@@ -15,14 +16,13 @@ export const UsersPage = () => {
 
         <TabPanels>
           <TabPanel>
-            <UsersList />
           </TabPanel>
 
           <TabPanel>
             <UserTypesList />
           </TabPanel>
         </TabPanels>
-      </Tabs>
+      </Tabs> */}
     </Box>
   );
 };

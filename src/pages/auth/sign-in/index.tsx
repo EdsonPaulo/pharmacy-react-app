@@ -20,10 +20,10 @@ export const SignInPage = () => {
   const { handleSignIn, isLoading, formData, handleChangeFormData } = useAuth();
 
   return (
-    <Flex minHeight="100vh" bg="brand.primary">
+    <Flex minH="100vh" bg="brand.primary">
       <Box flex={1} p={4} display={{ base: 'none', md: 'block' }}>
         <Box
-          h="100vh"
+          minH="100%"
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -43,7 +43,7 @@ export const SignInPage = () => {
             Entrar agora na conta
           </Text>
 
-          <Box h="4px" w="35px" bg="brand.primary" mt={1} mb={4} />
+          <Box h="4px" w="35px" bg="brand.primary" mt={1} mb={5} />
 
           <Text mb={1}>Email</Text>
           <Input
@@ -57,7 +57,7 @@ export const SignInPage = () => {
             }
           />
 
-          <Box mt={3} mb={6}>
+          <Box mt={4} mb={7}>
             <Text mb={1}>Palavra-passe</Text>
             <InputGroup size="md">
               <Input
