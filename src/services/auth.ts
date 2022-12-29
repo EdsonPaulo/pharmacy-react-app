@@ -9,7 +9,7 @@ export const postSignIn = async (payload: {
     email: payload.email,
     password: payload.password,
   });
-  return response.data;
+  return response?.data?.data;
 };
 
 export const postSignUp = async (payload: {
@@ -23,5 +23,10 @@ export const postSignUp = async (payload: {
     email: payload.email,
     password: payload.password,
   });
-  return response.data;
+  return response?.data?.data;
+};
+
+export const getMeUser = async () => {
+  const response = await APIConnector.get('/user/me');
+  return response?.data?.data;
 };

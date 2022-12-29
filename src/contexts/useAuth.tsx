@@ -10,7 +10,7 @@ import {
 import { useMutation } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES, AUTH_ROUTES } from '../constants/routes';
-import { postSignIn, postSignUp } from '../services/auth';
+import { getMeUser, postSignIn, postSignUp } from '../services/auth';
 
 interface TFormData {
   name: string;
@@ -51,8 +51,12 @@ export const AuthProvider = (props: any) => {
     email: '',
     password: '',
   });
+  const { isLoading: isLoadingUser, mutate: mutateGetMeUser } = useMutation(
+    'get-me-user',
+    getMeUser,
+  );
   const { isLoading: isLoadingSignIn, mutate: mutateSignIn } = useMutation(
-    'sign-in',
+    'sign-In',
     postSignIn,
   );
   const { isLoading: isLoadingSignUp, mutate: mutateSignUp } = useMutation(
@@ -79,6 +83,7 @@ export const AuthProvider = (props: any) => {
           title: 'Login efectuado com sucesso!',
         });
         navigate(ROUTES.Dashboard);
+        localStorage.setItem('access_token', res.access_token);
       },
       onError: () => {
         toast({
@@ -105,6 +110,7 @@ export const AuthProvider = (props: any) => {
           title: 'Conta criada com sucesso!',
         });
         navigate(ROUTES.Dashboard);
+        localStorage.setItem('access_token', res.access_token);
       },
       onError: () => {
         toast({
@@ -129,14 +135,26 @@ export const AuthProvider = (props: any) => {
     if (isLoggedIn && Object.values(AUTH_ROUTES).includes(pathname)) {
       navigate(ROUTES.Dashboard);
     }
-  }, [navigate, pathname]);
+  }, [navigate, pathname, isLoggedIn]);
+
+  useEffect(() => {
+    mutateGetMeUser(undefined, {
+      onSuccess: (res) => {
+        setUser(res);
+        setIsLoggedIn(true);
+      },
+      onError: () => {
+        handleLogout();
+      },
+    });
+  }, [handleLogout, mutateGetMeUser]);
 
   const memoizedValue = useMemo(
     () => ({
       user,
       isLoggedIn,
       formData,
-      isLoading: isLoadingSignIn || isLoadingSignUp,
+      isLoading: isLoadingUser || isLoadingSignIn || isLoadingSignUp,
       handleSignIn,
       handleSignUp,
       handleLogout,
@@ -146,6 +164,7 @@ export const AuthProvider = (props: any) => {
       user,
       isLoggedIn,
       formData,
+      isLoadingUser,
       isLoadingSignIn,
       isLoadingSignUp,
       handleSignIn,

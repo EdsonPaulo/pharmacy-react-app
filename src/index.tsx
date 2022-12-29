@@ -1,6 +1,9 @@
 import '@fontsource/roboto-slab';
 import '@fontsource/roboto';
 import '@fontsource/poppins';
+import 'nprogress/nprogress.css';
+
+import NProgress from 'nprogress';
 import { ChakraProvider, ColorModeScript } from '@chakra-ui/react';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
@@ -12,6 +15,8 @@ import './styles/globals.scss';
 import { Router } from './routes';
 import { QueryClient, QueryClientProvider } from 'react-query';
 import { AuthProvider } from './contexts/useAuth';
+
+NProgress.configure({ showSpinner: true });
 
 const container = document.getElementById('root');
 if (container == null) throw new Error('Failed to find the root element');
