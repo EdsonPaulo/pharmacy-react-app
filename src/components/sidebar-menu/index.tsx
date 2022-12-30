@@ -1,13 +1,10 @@
 import { Box, Flex, Icon, Image, Link, Text } from '@chakra-ui/react';
-import { AdminMenu } from './menu-items';
-import { AiOutlinePoweroff } from 'react-icons/ai';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import { useAuth } from '../../contexts/useAuth';
+import { AdminMenu } from './menu-items';
 
 export const SidebarMenu = () => {
   const { pathname } = useLocation();
-  const { handleLogout } = useAuth();
 
   return (
     <Flex
@@ -17,6 +14,7 @@ export const SidebarMenu = () => {
       bgColor="brand.primary"
       flexDirection="column"
       position="fixed"
+      zIndex={2}
       justifyContent="space-between"
     >
       <Box>
@@ -30,7 +28,7 @@ export const SidebarMenu = () => {
           <Box key={item.title} mb={12} pl={10}>
             <Text
               mb={3}
-              fontSize={14}
+              fontSize={12}
               textTransform="uppercase"
               fontFamily="Roboto"
               fontWeight="900"
@@ -61,10 +59,10 @@ export const SidebarMenu = () => {
                   }
                   _hover={{ background: 'brand.primaryDark' }}
                 >
-                  <Icon mr={3} as={menuItem.icon} boxSize={5} color="white" />
+                  <Icon mr={3} as={menuItem.icon} boxSize={4} color="white" />
                   <Text
                     fontWeight="600"
-                    fontSize={14}
+                    fontSize={13}
                     letterSpacing={1.1}
                     textTransform={'capitalize'}
                   >
@@ -76,19 +74,6 @@ export const SidebarMenu = () => {
           </Box>
         ))}
       </Box>
-
-      <Flex
-        pb={20}
-        ml={10}
-        cursor="pointer"
-        _hover={{ textDecor: 'underline' }}
-        onClick={() => handleLogout()}
-      >
-        <Icon mr={3} boxSize={5} color="white" as={AiOutlinePoweroff} />
-        <Text fontWeight="600" fontSize={16} letterSpacing={1.1}>
-          Terminar sessão
-        </Text>
-      </Flex>
     </Flex>
   );
 };

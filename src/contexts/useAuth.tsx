@@ -11,6 +11,7 @@ import { useMutation } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES, AUTH_ROUTES } from '../constants/routes';
 import { getMeUser, postSignIn, postSignUp } from '../services/auth';
+import { IUser } from '../types/types';
 
 interface TFormData {
   name: string;
@@ -22,7 +23,7 @@ interface TAuthContextData {
   isLoading: boolean;
   isLoggedIn: boolean;
   formData: TFormData;
-  user: any;
+  user: IUser;
   handleSignIn: () => void;
   handleSignUp: () => void;
   handleLogout: () => void;
@@ -72,8 +73,8 @@ export const AuthProvider = (props: any) => {
 
   const handleSignIn = useCallback(() => {
     mutateSignIn(formData, {
-      onSuccess: (res) => {
-        setUser(res);
+      onSuccess: (u) => {
+        setUser(u);
         setIsLoggedIn(true);
         toast({
           duration: 2000,
@@ -83,15 +84,16 @@ export const AuthProvider = (props: any) => {
           title: 'Login efectuado com sucesso!',
         });
         navigate(ROUTES.Dashboard);
-        localStorage.setItem('access_token', res.access_token);
+        localStorage.setItem('access_token', u.accessToken);
       },
-      onError: () => {
+      onError: (e: any) => {
         toast({
           duration: 3000,
           position: 'top-right',
           variant: 'subtle',
           status: 'error',
-          title: 'Email ou Palavra-passe inválidos',
+          title:
+            e?.response?.data?.message ?? 'Email ou Palavra-passe inválidos',
         });
       },
     });
@@ -99,8 +101,8 @@ export const AuthProvider = (props: any) => {
 
   const handleSignUp = useCallback(() => {
     mutateSignUp(formData, {
-      onSuccess: (res) => {
-        setUser(res);
+      onSuccess: (u) => {
+        setUser(u);
         setIsLoggedIn(true);
         toast({
           duration: 2000,
@@ -110,15 +112,16 @@ export const AuthProvider = (props: any) => {
           title: 'Conta criada com sucesso!',
         });
         navigate(ROUTES.Dashboard);
-        localStorage.setItem('access_token', res.access_token);
+        localStorage.setItem('access_token', u.accessToken);
       },
-      onError: () => {
+      onError: (e: any) => {
         toast({
           duration: 3000,
           position: 'top-right',
           variant: 'subtle',
           status: 'error',
-          title: 'Ocorreu um erro ao criar a conta!',
+          title:
+            e?.response?.data?.message ?? 'Ocorreu um erro ao criar a conta!',
         });
       },
     });
@@ -139,15 +142,16 @@ export const AuthProvider = (props: any) => {
 
   useEffect(() => {
     mutateGetMeUser(undefined, {
-      onSuccess: (res) => {
-        setUser(res);
+      onSuccess: (u) => {
+        setUser(u);
         setIsLoggedIn(true);
       },
       onError: () => {
         handleLogout();
       },
     });
-  }, [handleLogout, mutateGetMeUser]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const memoizedValue = useMemo(
     () => ({

@@ -20,14 +20,13 @@ import { useQuery } from 'react-query';
 import { FiPlus } from 'react-icons/fi';
 import { getUsers } from '../../services/users';
 import { useMemo } from 'react';
+import { UserTypesMap } from './users.helpers';
 
-const UserTypesMap: Record<string, string> = {
-  customer: 'Cliente',
-  admin: 'Administrador',
-  employee: 'Funcionário',
-};
+interface UsersListProps {
+  onPressAddNew: () => void;
+}
 
-export const UsersList = () => {
+export const UsersList = ({ onPressAddNew }: UsersListProps) => {
   const { data, isLoading } = useQuery('users', getUsers);
 
   const isEmpty = useMemo(
@@ -65,6 +64,7 @@ export const UsersList = () => {
                 size="md"
                 color="brand.primary"
                 leftIcon={<FiPlus />}
+                onClick={onPressAddNew}
               >
                 Adicionar
               </Button>
@@ -91,12 +91,14 @@ export const UsersList = () => {
                   </Th>
                 ) : (
                   <Tbody>
-                    {data?.map((u: any) => (
-                      <Tr key={u.pk_user}>
-                        <Td>{u.pk_user}</Td>
-                        <Td>{(u?.customer || u?.employee)?.name}</Td>
+                    {data?.map((u) => (
+                      <Tr key={u.pkUser}>
+                        <Td>{u.pkUser}</Td>
+                        <Td>
+                          {u?.personalInfo?.name ?? u?.email?.split?.('@')?.[0]}
+                        </Td>
                         <Td>{u.email}</Td>
-                        <Td>{UserTypesMap[u.user_type]}</Td>
+                        <Td>{UserTypesMap[u.userType]}</Td>
                       </Tr>
                     ))}
                   </Tbody>
@@ -104,10 +106,8 @@ export const UsersList = () => {
 
                 {!isEmpty && (
                   <>
-                    <Tfoot>
-                      <Box />
-                    </Tfoot>
-                    {data.length > 5 && (
+                    <Tfoot></Tfoot>
+                    {(data ?? [])?.length > 5 && (
                       <TableCaption mt={4} pb={6}>
                         Tabela de utilizadores no sistema
                       </TableCaption>
