@@ -1,0 +1,223 @@
+[
+  {
+    "name": "Benguela",
+    "cities": [
+      "Balombo",
+      "Benguela",
+      "Baia Farta",
+      "Bocoio",
+      "Catumbela",
+      "Chongoroi",
+      "Cubal",
+      "Ganda",
+      "Lobito"
+    ]
+  },
+  {
+    "name": "Bié",
+    "cities": [
+      "Andulo",
+      "Catabola",
+      "Chinguar",
+      "Chitembo",
+      "Cuemba",
+      "Cunhinga",
+      "Camacupa",
+      "Kuito",
+      "Nharea"
+    ]
+  },
+  {
+    "name": "Bengo",
+    "cities": ["Ambriz", "Dande", "Icolo et Bengo", "Muxima", "Nambuangongo"]
+  },
+  {
+    "name": "Cabinda",
+    "cities": ["Belize", "Buco-Zau", "Cabinda", "Cacongo", "Miconje"]
+  },
+  {
+    "name": "Cuando Cubango",
+    "cities": [
+      "Calai",
+      "Cuito Cuanavale",
+      "Cuchi",
+      "Cuangar",
+      "Dirico",
+      "Longa",
+      "Mavinga",
+      "Menongue",
+      "Rivungo"
+    ]
+  },
+  {
+    "name": "Cuanza Norte",
+    "cities": [
+      "Ambaca",
+      "Bula Atumba",
+      "Banga",
+      "Bolongongo",
+      "Canbambe",
+      "Cazengo",
+      "Dembos",
+      "Golungo Alto",
+      "Gonguembo",
+      "Lucala",
+      "Pango Aluguem",
+      "Quiculungo",
+      "Samba Caju"
+    ]
+  },
+  {
+    "name": "Cuanza Sul",
+    "cities": [
+      "Amboim",
+      "Cassongue",
+      "Conda",
+      "Ebo",
+      "Libolo",
+      "Mussende",
+      "Porto Amboim",
+      "Quibala",
+      "Quilenda",
+      "Seles (Angola)",
+      "Sumbe",
+      "Waku-Kungo"
+    ]
+  },
+  {
+    "name": "Cunene",
+    "cities": [
+      "Cahama",
+      "Cuanhama",
+      "Curoca",
+      "Cuvelai",
+      "Namacunde",
+      "Ombadja"
+    ]
+  },
+  {
+    "name": "Huila",
+    "cities": [
+      "Chibia",
+      "Caconda",
+      "Chiange",
+      "Chicomba",
+      "Chipindo",
+      "Caluquembe",
+      "Humpata",
+      "Jamba",
+      "Kuvango",
+      "Lubango",
+      "Matala",
+      "Quilengues",
+      "Quipungo"
+    ]
+  },
+  {
+    "name": "Huambo",
+    "cities": [
+      "Bailundo",
+      "Caála",
+      "Catchiungo",
+      "Ekunha",
+      "Huambo",
+      "Londuimbale",
+      "Longonjo",
+      "Mungo",
+      "Tchindjenje",
+      "Tchicala-Tcholoanga",
+      "Ucuma"
+    ]
+  },
+  {
+    "name": "Lunda Norte",
+    "cities": [
+      "Cambulo",
+      "Chitato",
+      "Cuilo",
+      "Camulemba",
+      "Cuango",
+      "Capenda",
+      "Cuangula",
+      "Lubalo",
+      "Tchitato",
+      "Xa Muteba"
+    ]
+  },
+  { "name": "Lunda Sul", "cities": ["Cacolo", "Dala", "Muconda", "Saurimo"] },
+  {
+    "name": "Luanda",
+    "cities": [
+      "Cacuaco",
+      "Cazenga",
+      "Ingombota",
+      "Kilamba Kiaxi",
+      "Maianga",
+      "Rangel",
+      "Samba",
+      "Sambizanga",
+      "Viana"
+    ]
+  },
+  {
+    "name": "Malanje",
+    "cities": [
+      "Cambundi-Catembo",
+      "Cunda-dia-baza",
+      "Cangandala",
+      "Calandula",
+      "Cuaba Nzogo",
+      "Caombo",
+      "Caruzo",
+      "Luquembo",
+      "Malange",
+      "Marimba",
+      "Massango",
+      "Mucari",
+      "Quela",
+      "Quirima"
+    ]
+  },
+  {
+    "name": "Moxico",
+    "cities": [
+      "Alto Zambeze",
+      "Bundas",
+      "Cameia",
+      "Camanongue",
+      "Leua",
+      "Lucano",
+      "Luau",
+      "Luchazes",
+      "Moxico"
+    ]
+  },
+  {
+    "name": "Namibe",
+    "cities": ["Bibala", "Camacuio", "Namibe", "Tombwa", "Virei"]
+  },
+  {
+    "name": "Uíge",
+    "cities": [
+      "Alto Cauale",
+      "Ambuila",
+      "Bembe",
+      "Buengas",
+      "Damba",
+      "Macocola",
+      "Mucaba",
+      "Negage",
+      "Puri",
+      "Quimbele",
+      "Quitexe",
+      "Songo",
+      "Sanza Pombo",
+      "Uíge",
+      "Zombo"
+    ]
+  },
+  {
+    "name": "Zaire",
+    "cities": ["Cuimba", "M'Banza Congo", "Noqui", "N'Zeto", "Soyo", "Tomboco"]
+  }
+]

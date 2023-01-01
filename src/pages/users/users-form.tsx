@@ -19,68 +19,86 @@ import { postCreateUser } from '../../services/users';
 import { useFormik } from 'formik';
 import { newUserSchema, UserTypesMap } from './users.helpers';
 import { UserTypeEnum } from '../../types/enums';
+import { IUser } from '../../types/types';
 
 interface UsersFormProps {
+  mode: 'edit' | 'view';
+  selectedUser?: IUser;
   onClose: () => void;
+  onRefetch: () => void;
 }
 
-export const UsersForm = ({ onClose }: UsersFormProps) => {
+export const UsersForm = ({
+  selectedUser,
+  mode,
+  onClose,
+  onRefetch,
+}: UsersFormProps) => {
   const toast = useToast();
   const { isLoading, mutate: mutateAddUser } = useMutation(
     'create-user',
     postCreateUser,
   );
 
-  const { handleSubmit, isValid, errors, touched, handleChange, resetForm } =
-    useFormik({
-      validationSchema: newUserSchema,
-      enableReinitialize: true,
-      validateOnMount: true,
-      validateOnChange: true,
-      initialValues: {
-        name: '',
-        email: '',
-        password: '',
-        user_type: null,
-      },
-      onSubmit: (values) => {
-        mutateAddUser(values, {
-          onSuccess: () => {
-            resetForm();
-            toast({
-              duration: 2000,
-              position: 'top-right',
-              variant: 'subtle',
-              status: 'success',
-              title: 'Utilizador criado com sucesso!',
-            });
-            onClose();
-          },
-          onError: (e: any) => {
-            toast({
-              duration: 3000,
-              position: 'top-right',
-              variant: 'subtle',
-              status: 'error',
-              title:
-                e?.response?.data?.message ??
-                'Ocorreu um erro ao criar utilizador',
-            });
-          },
-        });
-      },
-    });
+  const isViewMode = useMemo(() => mode === 'view', [mode]);
+
+  const {
+    handleSubmit,
+    isValid,
+    errors,
+    touched,
+    handleChange,
+    resetForm,
+    values,
+  } = useFormik({
+    validationSchema: newUserSchema,
+    enableReinitialize: true,
+    validateOnMount: true,
+    validateOnChange: true,
+    initialValues: {
+      name: selectedUser?.personalInfo?.name ?? '',
+      email: selectedUser?.email ?? '',
+      password: selectedUser ? '' : '#Abc1234',
+      user_type: selectedUser?.userType ?? null,
+    },
+    onSubmit: (values) => {
+      mutateAddUser(values, {
+        onSuccess: async () => {
+          resetForm();
+          toast({
+            duration: 2000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'success',
+            title: 'Utilizador criado com sucesso!',
+          });
+          onRefetch();
+          onClose();
+        },
+        onError: (e: any) => {
+          toast({
+            duration: 3000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'error',
+            title:
+              e?.response?.data?.message ??
+              'Ocorreu um erro ao criar utilizador',
+          });
+        },
+      });
+    },
+  });
 
   const isAddButtonDisabled = useMemo(
-    () => isLoading || !isValid,
-    [isLoading, isValid],
+    () => isLoading || !isValid || isViewMode,
+    [isLoading, isValid, isViewMode],
   );
-  console.log(errors, touched);
 
   return (
     <form onSubmit={handleSubmit}>
       <ModalContent>
-        <ModalHeader>Novo Usuário</ModalHeader>
+        <ModalHeader>{selectedUser ? 'Editar' : 'Novo'} Utilizador</ModalHeader>
         <ModalCloseButton />
 
         <ModalBody>
@@ -94,6 +112,8 @@ export const UsersForm = ({ onClose }: UsersFormProps) => {
                 id="name"
                 name="name"
                 type="text"
+                value={values.name}
+                disabled={isViewMode}
                 placeholder="ex.: John Doe"
                 onChange={handleChange}
               />
@@ -109,6 +129,8 @@ export const UsersForm = ({ onClose }: UsersFormProps) => {
                 id="email"
                 name="email"
                 type="email"
+                value={values.email}
+                disabled={isViewMode}
                 placeholder="utilizador@email.com"
                 onChange={handleChange}
               />
@@ -124,6 +146,8 @@ export const UsersForm = ({ onClose }: UsersFormProps) => {
                 id="password"
                 name="password"
                 type="password"
+                value={values.password}
+                disabled={isViewMode}
                 placeholder="********"
                 onChange={handleChange}
               />
@@ -138,6 +162,8 @@ export const UsersForm = ({ onClose }: UsersFormProps) => {
               <Select
                 id="user_type"
                 name="user_type"
+                disabled={isViewMode}
+                value={values.user_type as any}
                 placeholder="Selecione um opção"
                 onChange={handleChange}
               >
@@ -164,7 +190,7 @@ export const UsersForm = ({ onClose }: UsersFormProps) => {
             disabled={isAddButtonDisabled}
             type="submit"
           >
-            Adicionar
+            Submeter
           </Button>
         </ModalFooter>
       </ModalContent>

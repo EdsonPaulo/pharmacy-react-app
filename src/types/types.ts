@@ -13,7 +13,7 @@ export interface IGeneralUser {
   email: string;
   bi?: string;
   phone?: string;
-  birthDate?: Date;
+  birthDate?: string;
   address?: IAddress;
 }
 

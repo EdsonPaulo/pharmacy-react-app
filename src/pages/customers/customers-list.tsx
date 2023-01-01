@@ -26,40 +26,39 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
-import { IUser } from '../../types/types';
-import { UserTypesMap } from './users.helpers';
+import { ICustomer } from '../../types/types';
 
-interface UsersListProps {
+interface CustomersListProps {
   isLoading: boolean;
   isEmpty: boolean;
-  users?: IUser[];
+  customers?: ICustomer[];
   onAddNew: () => void;
-  onView: (user: IUser) => void;
-  onEdit: (user: IUser) => void;
+  onView: (customer: ICustomer) => void;
+  onEdit: (customer: ICustomer) => void;
 }
 
-export const UsersList = ({
-  users = [],
+export const CustomersList = ({
+  customers = [],
   isLoading,
   isEmpty,
   onAddNew,
   onView,
   onEdit,
-}: UsersListProps) => {
+}: CustomersListProps) => {
   const cancelRef = useRef();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedUser, setSelectedUser] = useState<IUser>();
+  const [selectedCustomer, setSelectedCustomer] = useState<ICustomer>();
 
   const onDelete = useCallback(
-    (user: IUser) => {
-      setSelectedUser(user);
+    (customer: ICustomer) => {
+      setSelectedCustomer(customer);
       onOpen();
     },
     [onOpen],
   );
 
   const handleConfirmClose = useCallback(() => {
-    // delete user
+    // delete customer
     onClose();
   }, [onClose]);
 
@@ -85,7 +84,7 @@ export const UsersList = ({
           <Box>
             <Flex justifyContent="space-between" p={6} alignItems="center">
               <Heading as="h1" fontSize={18} color="brand.primary">
-                Utilizadores
+                Clientes
               </Heading>
 
               <Button
@@ -106,7 +105,8 @@ export const UsersList = ({
                     <Th>#</Th>
                     <Th>Nome</Th>
                     <Th>Email</Th>
-                    <Th>Tipo</Th>
+                    <Th>Telefone</Th>
+                    <Th>BI</Th>
                     <Th>Ações</Th>
                   </Tr>
                 </Thead>
@@ -121,35 +121,34 @@ export const UsersList = ({
                   </Th>
                 ) : (
                   <Tbody>
-                    {users?.map((u) => (
-                      <Tr key={u.pkUser}>
-                        <Td>{u.pkUser}</Td>
-                        <Td>
-                          {u?.personalInfo?.name ?? u?.email?.split?.('@')?.[0]}
-                        </Td>
-                        <Td>{u.email}</Td>
-                        <Td>{UserTypesMap[u.userType]}</Td>
+                    {customers?.map((c) => (
+                      <Tr key={c.pkCustomer}>
+                        <Td>{c.pkCustomer}</Td>
+                        <Td>{c?.name}</Td>
+                        <Td>{c.email ?? '-'}</Td>
+                        <Td>{c.phone ?? '-'}</Td>
+                        <Td>{c.bi ?? '-'}</Td>
                         <Td>
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="visualizar"
                             icon={<FiEye />}
-                            onClick={() => onView(u)}
+                            onClick={() => onView(c)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="editar"
                             icon={<FiEdit />}
-                            onClick={() => onEdit(u)}
+                            onClick={() => onEdit(c)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="deletar"
                             icon={<FiTrash2 />}
-                            onClick={() => onDelete(u)}
+                            onClick={() => onDelete(c)}
                           />
                         </Td>
                       </Tr>
@@ -160,9 +159,9 @@ export const UsersList = ({
                 {!isEmpty && (
                   <>
                     <Tfoot></Tfoot>
-                    {users?.length > 5 && (
+                    {customers?.length > 5 && (
                       <TableCaption mt={4} pb={6}>
-                        Tabela de utilizadores no sistema
+                        Tabela de clientes no sistema
                       </TableCaption>
                     )}
                   </>
@@ -181,12 +180,12 @@ export const UsersList = ({
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Eliminar Utilizador
+              Eliminar cliente
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Deseja eliminar o utilizador
-              <b> {selectedUser?.personalInfo?.name}</b>?
+              Deseja eliminar o cliente
+              <b> {selectedCustomer?.name}</b>?
             </AlertDialogBody>
 
             <AlertDialogFooter>

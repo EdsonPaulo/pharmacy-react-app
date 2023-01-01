@@ -11,7 +11,15 @@ import {
   Text,
   Icon,
   Button,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
 } from '@chakra-ui/react';
+import { useCallback, useRef } from 'react';
 import { AiOutlinePoweroff, AiOutlineEdit } from 'react-icons/ai';
 import { FiSettings, FiChevronDown } from 'react-icons/fi';
 import { Link as RouterLink } from 'react-router-dom';
@@ -21,6 +29,17 @@ import { UserTypesMap } from '../../pages/users/users.helpers';
 
 export const HeaderBar = () => {
   const { user, handleLogout } = useAuth();
+  const { isOpen, onOpen, onClose } = useDisclosure();
+  const cancelRef = useRef();
+
+  const handlePressLogout = useCallback(() => {
+    onOpen();
+  }, [onOpen]);
+
+  const handleConfirmClose = useCallback(() => {
+    onClose();
+    handleLogout();
+  }, [handleLogout, onClose]);
 
   return (
     <Flex
@@ -87,12 +106,37 @@ export const HeaderBar = () => {
           <MenuItem
             fontSize="sm"
             icon={<AiOutlinePoweroff size={16} />}
-            onClick={() => handleLogout()}
+            onClick={handlePressLogout}
           >
             Terminar Sessão
           </MenuItem>
         </MenuList>
       </Menu>
+
+      <AlertDialog
+        isOpen={isOpen}
+        onClose={onClose}
+        leastDestructiveRef={cancelRef as any}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Terminar Sessão
+            </AlertDialogHeader>
+
+            <AlertDialogBody>Deseja terminar a sessão e sair?</AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button mr={3} ref={cancelRef as any} onClick={onClose}>
+                Não
+              </Button>
+              <Button colorScheme="red" onClick={handleConfirmClose}>
+                Sim
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
     </Flex>
   );
 };
