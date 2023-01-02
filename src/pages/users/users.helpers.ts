@@ -1,6 +1,6 @@
 import * as Yup from 'yup';
 
-import { UserTypeEnum } from '../../types/enums';
+import { UserTypeEnum } from '../../typescript/enums';
 
 const REQUIRED_MESSAGE = 'Campo obrigatório';
 

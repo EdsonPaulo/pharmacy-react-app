@@ -6,6 +6,8 @@ export interface IAddress {
   residence: string;
   city: string;
   phone?: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IGeneralUser {
@@ -15,6 +17,8 @@ export interface IGeneralUser {
   phone?: string;
   birthDate?: string;
   address?: IAddress;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface IUser {

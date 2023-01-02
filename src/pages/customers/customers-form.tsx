@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 import {
   ModalContent,
   ModalHeader,
@@ -7,6 +8,7 @@ import {
   Button,
   FormControl,
   FormErrorMessage,
+  FormHelperText,
   FormLabel,
   Input,
   SimpleGrid,
@@ -14,13 +16,14 @@ import {
   useToast,
   Divider,
   Select,
+  Box,
 } from '@chakra-ui/react';
 import { useCallback, useMemo } from 'react';
 import { useMutation } from 'react-query';
 import { postCreateCustomer, putEditCustomer } from '../../services/customers';
 import { useFormik } from 'formik';
 import { customerSchema } from './customers.helpers';
-import { ICustomer } from '../../types/types';
+import { ICustomer } from '../../typescript/types';
 import AngolaCities from '../../constants/angolan-cities.json';
 
 interface CustomersFormProps {
@@ -47,6 +50,11 @@ export const CustomersForm = ({
   );
 
   const isViewMode = useMemo(() => mode === 'view', [mode]);
+
+  const isEditMode = useMemo(
+    () => mode === 'edit' && !!selectedCustomer?.pkCustomer,
+    [mode, selectedCustomer],
+  );
 
   const luandaCities = useMemo(
     () =>
@@ -117,7 +125,7 @@ export const CustomersForm = ({
         address: values?.address?.residence ? values.address : null,
       };
 
-      if (mode === 'edit' && !!selectedCustomer) {
+      if (isEditMode && !!selectedCustomer) {
         mutateEditCustomer(
           { customer: formData, customerId: selectedCustomer?.pkCustomer },
           {
@@ -157,161 +165,251 @@ export const CustomersForm = ({
   return (
     <form onSubmit={handleSubmit}>
       <ModalContent>
-        <ModalHeader>{mode === 'edit' ? 'Editar' : 'Novo'} Cliente</ModalHeader>
+        <ModalHeader>
+          {isViewMode
+            ? selectedCustomer?.name
+            : isEditMode
+            ? 'Editar Cliente'
+            : 'Novo Cliente'}
+        </ModalHeader>
         <ModalCloseButton />
 
         <ModalBody>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="15px">
             <FormControl
-              isInvalid={!!errors?.name && !!touched.name}
-              isRequired
+              isInvalid={!isViewMode && !!errors?.name && !!touched.name}
+              isRequired={!isViewMode}
             >
               <FormLabel>Nome Completo</FormLabel>
-              <Input
-                id="name"
-                name="name"
-                value={values.name}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : 'ex.: John Doe'}
-                onChange={handleChange}
-              />
+              {isViewMode ? (
+                <Text fontWeight="900">{selectedCustomer?.name || '-'}</Text>
+              ) : (
+                <Input
+                  id="name"
+                  name="name"
+                  value={values.name}
+                  placeholder={'ex.: John Doe'}
+                  onChange={handleChange}
+                />
+              )}
               <FormErrorMessage>{errors.name}</FormErrorMessage>
             </FormControl>
 
             <FormControl
-              isRequired
-              isInvalid={!!errors.email && !!touched.email}
+              isRequired={!isViewMode}
+              isInvalid={!isViewMode && !!errors.email && !!touched.email}
             >
               <FormLabel>Email</FormLabel>
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                value={values.email}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : 'cliente@email.com'}
-                onChange={handleChange}
-              />
+              {isViewMode ? (
+                <Text fontWeight="900">{selectedCustomer?.email || '-'}</Text>
+              ) : (
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  value={values.email}
+                  disabled={isEditMode}
+                  placeholder={'cliente@email.com'}
+                  onChange={handleChange}
+                />
+              )}
+              {isEditMode && (
+                <FormHelperText color={'orange.500'} fontSize="xs">
+                  Caso queira alterar o email entre em contacto com o suporte!
+                </FormHelperText>
+              )}
               <FormErrorMessage>{errors.email}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.phone && !!touched.phone}>
+            <FormControl
+              isInvalid={!isViewMode && !!errors.phone && !!touched.phone}
+            >
               <FormLabel>Telefone</FormLabel>
-              <Input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={values.phone}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : '9XX XXX XXX'}
-                onChange={handleChange}
-              />
+              {isViewMode ? (
+                <Text fontWeight="900">{selectedCustomer?.phone || '-'}</Text>
+              ) : (
+                <Input
+                  id="phone"
+                  name="phone"
+                  type="tel"
+                  value={values.phone}
+                  placeholder={'9XX XXX XXX'}
+                  onChange={handleChange}
+                />
+              )}
+
               <FormErrorMessage>{errors.phone}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!!errors.bi && !!touched.bi}>
+            <FormControl isInvalid={!isViewMode && !!errors.bi && !!touched.bi}>
               <FormLabel>Bilhete de identidade</FormLabel>
-              <Input
-                id="bi"
-                name="bi"
-                value={values.bi}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : '05LAXXXXXXXXXXX'}
-                onChange={handleChange}
-              />
+              {isViewMode ? (
+                <Text fontWeight="900">{selectedCustomer?.bi || '-'}</Text>
+              ) : (
+                <Input
+                  id="bi"
+                  name="bi"
+                  value={values.bi}
+                  placeholder={'05LAXXXXXXXXXXX'}
+                  onChange={handleChange}
+                />
+              )}
+
               <FormErrorMessage>{errors.bi}</FormErrorMessage>
             </FormControl>
 
             <FormControl
-              isInvalid={!!errors.birth_date && !!touched.birth_date}
+              isInvalid={
+                !isViewMode && !!errors.birth_date && !!touched.birth_date
+              }
             >
               <FormLabel>Data de nascimento</FormLabel>
-              <Input
-                id="birth_date"
-                name="birth_date"
-                type="date"
-                value={values.birth_date}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : 'dd/mm/aaaa'}
-                onChange={handleChange}
-              />
+              {isViewMode ? (
+                <Text fontWeight="900">
+                  {selectedCustomer?.birthDate
+                    ? new Date(selectedCustomer?.birthDate).toLocaleDateString(
+                        'pt-PT',
+                      )
+                    : '-'}
+                </Text>
+              ) : (
+                <Input
+                  id="birth_date"
+                  name="birth_date"
+                  type="date"
+                  value={values.birth_date}
+                  placeholder={'dd/mm/aaaa'}
+                  onChange={handleChange}
+                />
+              )}
               <FormErrorMessage>{errors.birth_date}</FormErrorMessage>
             </FormControl>
 
-            <FormControl
-              isRequired
-              isInvalid={!!errors?.password && !!touched.password}
-            >
-              <FormLabel>Palavra-Passe</FormLabel>
-              <Input
-                id="password"
-                name="password"
-                type="password"
-                value={values.password}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : '********'}
-                onChange={handleChange}
-              />
-              <FormErrorMessage>{errors.password}</FormErrorMessage>
-            </FormControl>
+            {!isViewMode && (
+              <FormControl
+                isRequired
+                isInvalid={!!errors?.password && !!touched.password}
+              >
+                <FormLabel>Palavra-Passe</FormLabel>
+                <Input
+                  id="password"
+                  name="password"
+                  type="password"
+                  value={values.password}
+                  placeholder={'********'}
+                  onChange={handleChange}
+                />
+                <FormErrorMessage>{errors.password}</FormErrorMessage>
+              </FormControl>
+            )}
+
+            {isViewMode && (
+              <>
+                <Box>
+                  <FormLabel>Data de criação</FormLabel>
+                  <Text fontWeight="900">
+                    {selectedCustomer?.createdAt
+                      ? new Date(selectedCustomer?.createdAt).toLocaleString(
+                          'pt-PT',
+                        )
+                      : '-'}
+                  </Text>
+                </Box>
+                <Box>
+                  <FormLabel>Última actualização</FormLabel>
+                  <Text fontWeight="900">
+                    {selectedCustomer?.updatedAt
+                      ? new Date(selectedCustomer?.updatedAt).toLocaleString(
+                          'pt-PT',
+                        )
+                      : '-'}
+                  </Text>
+                </Box>
+              </>
+            )}
           </SimpleGrid>
 
           <Divider my={6} />
 
           <Text fontWeight="bold" fontSize="md">
-            Endereço (opcional):
+            Endereço {isViewMode ? '' : '(opcional)'}
           </Text>
           <SimpleGrid mt={3} columns={{ base: 1, md: 2, lg: 3 }} spacing="15px">
             <FormControl
-              isInvalid={!!errors?.address?.name && !!touched?.address?.name}
+              isInvalid={
+                !isViewMode &&
+                !!errors?.address?.name &&
+                !!touched?.address?.name
+              }
             >
               <FormLabel>Designação</FormLabel>
-              <Input
-                id="address.name"
-                name="address.name"
-                value={values?.address?.name}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : 'ex.: Casa da Vila Alice'}
-                onChange={handleChange}
-              />
+              {isViewMode ? (
+                <Text fontWeight="900">
+                  {selectedCustomer?.address?.name || '-'}
+                </Text>
+              ) : (
+                <Input
+                  id="address.name"
+                  name="address.name"
+                  value={values?.address?.name}
+                  placeholder={'ex.: Casa da Vila Alice'}
+                  onChange={handleChange}
+                />
+              )}
               <FormErrorMessage>{errors?.address?.name}</FormErrorMessage>
             </FormControl>
 
             <FormControl
-              isInvalid={!!errors?.address?.city && !!touched?.address?.city}
+              isInvalid={
+                !isViewMode &&
+                !!errors?.address?.city &&
+                !!touched?.address?.city
+              }
             >
               <FormLabel>Cidade</FormLabel>
-              <Select
-                id="address.city"
-                name="address.city"
-                value={values?.address?.city}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : 'Selecione uma cidade'}
-                onChange={handleChange}
-              >
-                {luandaCities.map((city) => (
-                  <option key={city} value={city}>
-                    {city}
-                  </option>
-                ))}
-              </Select>
+              {isViewMode ? (
+                <Text fontWeight="900">
+                  {selectedCustomer?.address?.city || '-'}
+                </Text>
+              ) : (
+                <Select
+                  id="address.city"
+                  name="address.city"
+                  value={values?.address?.city}
+                  placeholder={'Selecione uma cidade'}
+                  onChange={handleChange}
+                >
+                  {luandaCities.map((city) => (
+                    <option key={city} value={city}>
+                      {city}
+                    </option>
+                  ))}
+                </Select>
+              )}
               <FormErrorMessage>{errors?.address?.city}</FormErrorMessage>
             </FormControl>
 
             <FormControl
               isInvalid={
-                !!errors?.address?.residence && !!touched?.address?.residence
+                !isViewMode &&
+                !!errors?.address?.residence &&
+                !!touched?.address?.residence
               }
             >
               <FormLabel>Endereço</FormLabel>
-              <Input
-                id="address.residence"
-                name="address.residence"
-                value={values?.address?.residence}
-                disabled={isViewMode}
-                placeholder={isViewMode ? '' : 'ex.: Av. Deolinda, Casa 92'}
-                onChange={handleChange}
-              />
+              {isViewMode ? (
+                <Text fontWeight="900">
+                  {selectedCustomer?.address?.residence || '-'}
+                </Text>
+              ) : (
+                <Input
+                  id="address.residence"
+                  name="address.residence"
+                  value={values?.address?.residence}
+                  placeholder={'ex.: Av. Deolinda, Casa 92'}
+                  onChange={handleChange}
+                />
+              )}
               <FormErrorMessage>{errors?.address?.residence}</FormErrorMessage>
             </FormControl>
           </SimpleGrid>
@@ -319,18 +417,20 @@ export const CustomersForm = ({
 
         <ModalFooter>
           <Button mr={4} variant="ghost" onClick={onClose}>
-            Cancelar
+            Fechar
           </Button>
 
-          <Button
-            colorScheme="teal"
-            background="brand.primary"
-            isLoading={isLoading || isEditting}
-            disabled={isAddButtonDisabled}
-            type="submit"
-          >
-            Submeter
-          </Button>
+          {!isViewMode && (
+            <Button
+              colorScheme="teal"
+              background="brand.primary"
+              isLoading={isLoading || isEditting}
+              disabled={isAddButtonDisabled}
+              type="submit"
+            >
+              Submeter
+            </Button>
+          )}
         </ModalFooter>
       </ModalContent>
     </form>

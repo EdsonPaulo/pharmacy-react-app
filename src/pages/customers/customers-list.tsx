@@ -26,7 +26,7 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
-import { ICustomer } from '../../types/types';
+import { ICustomer } from '../../typescript/types';
 
 interface CustomersListProps {
   isLoading: boolean;
@@ -106,7 +106,7 @@ export const CustomersList = ({
                     <Th>Nome</Th>
                     <Th>Email</Th>
                     <Th>Telefone</Th>
-                    <Th>BI</Th>
+                    <Th>Criado em</Th>
                     <Th>Ações</Th>
                   </Tr>
                 </Thead>
@@ -127,7 +127,11 @@ export const CustomersList = ({
                         <Td>{c?.name}</Td>
                         <Td>{c.email ?? '-'}</Td>
                         <Td>{c.phone ?? '-'}</Td>
-                        <Td>{c.bi ?? '-'}</Td>
+                        <Td>
+                          {c.createdAt
+                            ? new Date(c.createdAt).toLocaleDateString('pt-BR')
+                            : '-'}
+                        </Td>
                         <Td>
                           <IconButton
                             size="sm"

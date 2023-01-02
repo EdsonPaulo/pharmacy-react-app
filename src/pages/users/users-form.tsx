@@ -18,8 +18,8 @@ import { useMutation } from 'react-query';
 import { postCreateUser } from '../../services/users';
 import { useFormik } from 'formik';
 import { newUserSchema, UserTypesMap } from './users.helpers';
-import { UserTypeEnum } from '../../types/enums';
-import { IUser } from '../../types/types';
+import { UserTypeEnum } from '../../typescript/enums';
+import { IUser } from '../../typescript/types';
 
 interface UsersFormProps {
   mode: 'edit' | 'view';
@@ -58,7 +58,7 @@ export const UsersForm = ({
     initialValues: {
       name: selectedUser?.personalInfo?.name ?? '',
       email: selectedUser?.email ?? '',
-      password: selectedUser ? '' : '#Abc1234',
+      password: '',
       user_type: selectedUser?.userType ?? null,
     },
     onSubmit: (values) => {

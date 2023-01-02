@@ -26,7 +26,7 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
-import { IUser } from '../../types/types';
+import { IUser } from '../../typescript/types';
 import { UserTypesMap } from './users.helpers';
 
 interface UsersListProps {

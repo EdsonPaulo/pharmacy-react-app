@@ -1,6 +1,6 @@
-import { UserTypeEnum } from '../types/enums';
+import { UserTypeEnum } from '../typescript/enums';
 import { toCamelCase } from '../helpers/objectTransform';
-import { IUser } from '../types/types';
+import { IUser } from '../typescript/types';
 import { APIConnector } from './APIConnector';
 
 export const postSignIn = async (payload: {

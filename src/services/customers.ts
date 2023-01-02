@@ -1,5 +1,5 @@
 import { toCamelCase } from '../helpers/objectTransform';
-import { ICustomer } from '../types/types';
+import { ICustomer } from '../typescript/types';
 import { APIConnector } from './APIConnector';
 
 export const getCustomers = async (): Promise<ICustomer[]> => {

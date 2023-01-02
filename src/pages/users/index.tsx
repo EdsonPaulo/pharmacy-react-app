@@ -2,7 +2,7 @@ import { Box, Modal, ModalOverlay, useDisclosure } from '@chakra-ui/react';
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
 import { getUsers } from '../../services/users';
-import { IUser } from '../../types/types';
+import { IUser } from '../../typescript/types';
 import { UsersForm } from './users-form';
 import { UsersList } from './users-list';
 

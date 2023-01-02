@@ -11,7 +11,7 @@ import { useMutation } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES, AUTH_ROUTES } from '../constants/routes';
 import { getMeUser, postSignIn, postSignUp } from '../services/auth';
-import { IUser } from '../types/types';
+import { IUser } from '../typescript/types';
 
 interface TFormData {
   name: string;
