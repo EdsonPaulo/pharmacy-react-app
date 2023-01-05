@@ -26,13 +26,13 @@ export interface IUser {
   email: string;
   accessToken: string;
   userType: UserTypeEnum;
-  personalInfo: ICustomer | IEmpoyee | null;
+  personalInfo: ICustomer | IEmployee | null;
 }
 
 export interface ICustomer extends IGeneralUser {
   pkCustomer: number;
 }
 
-export interface IEmpoyee extends IGeneralUser {
+export interface IEmployee extends IGeneralUser {
   pkEmployee: number;
 }
