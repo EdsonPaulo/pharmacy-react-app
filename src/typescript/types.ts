@@ -36,3 +36,24 @@ export interface ICustomer extends IGeneralUser {
 export interface IEmployee extends IGeneralUser {
   pkEmployee: number;
 }
+
+export interface IProductCategory {
+  pkProductCategory: number;
+  name: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IProduct {
+  pkProduct: number;
+  name: string;
+  price: number;
+  description: string;
+  stock: number;
+  manufactureDate: string;
+  expirationDate: string;
+  createdAt: string;
+  updatedAt: string;
+  fkProductCategory: number;
+  productCategory: IProductCategory;
+}

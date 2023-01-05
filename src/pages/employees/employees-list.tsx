@@ -112,7 +112,7 @@ export const EmployeesList = ({
                 </Thead>
 
                 {isEmpty ? (
-                  <Th colSpan={4}>
+                  <Th colSpan={6}>
                     <Center minH={350}>
                       <Text color="blackAlpha.500" textAlign="center">
                         Sem dados para mostrar!

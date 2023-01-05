@@ -26,39 +26,39 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
-import { ICustomer } from '../../typescript/types';
+import { IProductCategory } from '../../../typescript/types';
 
-interface CustomersListProps {
+interface ProductCategoriesTableProps {
   isLoading: boolean;
   isEmpty: boolean;
-  customers?: ICustomer[];
+  productCategories?: IProductCategory[];
   onAddNew: () => void;
-  onView: (customer: ICustomer) => void;
-  onEdit: (customer: ICustomer) => void;
+  onView: (product: IProductCategory) => void;
+  onEdit: (product: IProductCategory) => void;
 }
 
-export const CustomersList = ({
-  customers = [],
+export const ProductCategoriesTable = ({
+  productCategories = [],
   isLoading,
   isEmpty,
   onAddNew,
   onView,
   onEdit,
-}: CustomersListProps) => {
+}: ProductCategoriesTableProps) => {
   const cancelRef = useRef();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedCustomer, setSelectedCustomer] = useState<ICustomer>();
+  const [selectedProducts, setSelectedProducts] = useState<IProductCategory>();
 
   const onDelete = useCallback(
-    (customer: ICustomer) => {
-      setSelectedCustomer(customer);
+    (productCategory: IProductCategory) => {
+      setSelectedProducts(productCategory);
       onOpen();
     },
     [onOpen],
   );
 
   const handleConfirmClose = useCallback(() => {
-    // delete customer
+    // delete productCategory
     onClose();
   }, [onClose]);
 
@@ -84,7 +84,7 @@ export const CustomersList = ({
           <Box>
             <Flex justifyContent="space-between" p={6} alignItems="center">
               <Heading as="h1" fontSize={18} color="brand.primary">
-                Clientes
+                Categorias de produtos
               </Heading>
 
               <Button
@@ -104,15 +104,13 @@ export const CustomersList = ({
                   <Tr bg="#C4C4C4">
                     <Th>#</Th>
                     <Th>Nome</Th>
-                    <Th>Email</Th>
-                    <Th>Telefone</Th>
-                    <Th>Criado em</Th>
+                    <Th>Data criação</Th>
                     <Th>Ações</Th>
                   </Tr>
                 </Thead>
 
                 {isEmpty ? (
-                  <Th colSpan={6}>
+                  <Th colSpan={4}>
                     <Center minH={350}>
                       <Text color="blackAlpha.500" textAlign="center">
                         Sem dados para mostrar!
@@ -121,16 +119,12 @@ export const CustomersList = ({
                   </Th>
                 ) : (
                   <Tbody>
-                    {customers?.map((c) => (
-                      <Tr key={c.pkCustomer}>
-                        <Td>{c.pkCustomer}</Td>
-                        <Td>{c?.name}</Td>
-                        <Td>{c.email ?? '-'}</Td>
-                        <Td>{c.phone ?? '-'}</Td>
+                    {productCategories?.map((pc) => (
+                      <Tr key={pc.pkProductCategory}>
+                        <Td>{pc.pkProductCategory}</Td>
+                        <Td>{pc?.name}</Td>
                         <Td>
-                          {c.createdAt
-                            ? new Date(c.createdAt).toLocaleDateString('pt-BR')
-                            : '-'}
+                          {new Date(pc.createdAt).toLocaleDateString('pt-PT')}
                         </Td>
                         <Td>
                           <IconButton
@@ -138,21 +132,21 @@ export const CustomersList = ({
                             variant="ghost"
                             aria-label="visualizar"
                             icon={<FiEye />}
-                            onClick={() => onView(c)}
+                            onClick={() => onView(pc)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="editar"
                             icon={<FiEdit />}
-                            onClick={() => onEdit(c)}
+                            onClick={() => onEdit(pc)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="deletar"
                             icon={<FiTrash2 />}
-                            onClick={() => onDelete(c)}
+                            onClick={() => onDelete(pc)}
                           />
                         </Td>
                       </Tr>
@@ -163,9 +157,9 @@ export const CustomersList = ({
                 {!isEmpty && (
                   <>
                     <Tfoot></Tfoot>
-                    {customers?.length > 5 && (
+                    {productCategories?.length > 5 && (
                       <TableCaption mt={4} pb={6}>
-                        Tabela de clientes no sistema
+                        Tabela de categorias de produtos no sistema
                       </TableCaption>
                     )}
                   </>
@@ -184,12 +178,12 @@ export const CustomersList = ({
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Eliminar cliente
+              Eliminar Categoria
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Deseja eliminar o cliente
-              <b> {selectedCustomer?.name}</b>?
+              Deseja eliminar a categoria
+              <b> {selectedProducts?.name}</b>?
             </AlertDialogBody>
 
             <AlertDialogFooter>
