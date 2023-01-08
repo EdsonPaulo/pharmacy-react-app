@@ -23,9 +23,12 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useMutation } from 'react-query';
+import { deleteUser } from '../../services/users';
 import { IUser } from '../../typescript/types';
 import { UserTypesMap } from './users.helpers';
 
@@ -34,6 +37,7 @@ interface UsersListProps {
   isEmpty: boolean;
   users?: IUser[];
   onAddNew: () => void;
+  onRefetch: () => void;
   onView: (user: IUser) => void;
   onEdit: (user: IUser) => void;
 }
@@ -45,10 +49,16 @@ export const UsersList = ({
   onAddNew,
   onView,
   onEdit,
+  onRefetch,
 }: UsersListProps) => {
   const cancelRef = useRef();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedUser, setSelectedUser] = useState<IUser>();
+  const { mutate, isLoading: isDeletting } = useMutation(
+    'delete-user',
+    deleteUser,
+  );
 
   const onDelete = useCallback(
     (user: IUser) => {
@@ -59,9 +69,33 @@ export const UsersList = ({
   );
 
   const handleConfirmClose = useCallback(() => {
-    // delete user
-    onClose();
-  }, [onClose]);
+    if (selectedUser) {
+      mutate(selectedUser?.pkUser, {
+        onSuccess: () => {
+          toast({
+            duration: 2000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'success',
+            title: 'Utilizador elimidado com sucesso!',
+          });
+          onRefetch();
+          onClose();
+        },
+        onError: (e: any) => {
+          toast({
+            duration: 3000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'error',
+            title:
+              e?.response?.data?.message ??
+              'Ocorreu um erro ao eliminar utilizador!',
+          });
+        },
+      });
+    }
+  }, [mutate, onClose, onRefetch, selectedUser, toast]);
 
   return (
     <Flex p={10} alignItems="center">
@@ -150,6 +184,9 @@ export const UsersList = ({
                             aria-label="deletar"
                             icon={<FiTrash2 />}
                             onClick={() => onDelete(u)}
+                            isLoading={
+                              isDeletting && u.pkUser === selectedUser?.pkUser
+                            }
                           />
                         </Td>
                       </Tr>

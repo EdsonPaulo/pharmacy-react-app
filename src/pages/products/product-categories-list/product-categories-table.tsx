@@ -23,9 +23,12 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useMutation } from 'react-query';
+import { deleteProductCategory } from '../../../services/products';
 import { IProductCategory } from '../../../typescript/types';
 
 interface ProductCategoriesTableProps {
@@ -33,6 +36,7 @@ interface ProductCategoriesTableProps {
   isEmpty: boolean;
   productCategories?: IProductCategory[];
   onAddNew: () => void;
+  onRefetch: () => void;
   onView: (product: IProductCategory) => void;
   onEdit: (product: IProductCategory) => void;
 }
@@ -44,23 +48,54 @@ export const ProductCategoriesTable = ({
   onAddNew,
   onView,
   onEdit,
+  onRefetch,
 }: ProductCategoriesTableProps) => {
   const cancelRef = useRef();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedProducts, setSelectedProducts] = useState<IProductCategory>();
+  const [selectedProductCategory, setSelectedProductCategory] =
+    useState<IProductCategory>();
+  const { mutate, isLoading: isDeletting } = useMutation(
+    'delete-product-category',
+    deleteProductCategory,
+  );
 
   const onDelete = useCallback(
     (productCategory: IProductCategory) => {
-      setSelectedProducts(productCategory);
+      setSelectedProductCategory(productCategory);
       onOpen();
     },
     [onOpen],
   );
 
   const handleConfirmClose = useCallback(() => {
-    // delete productCategory
-    onClose();
-  }, [onClose]);
+    if (selectedProductCategory) {
+      mutate(selectedProductCategory?.pkProductCategory, {
+        onSuccess: () => {
+          toast({
+            duration: 2000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'success',
+            title: 'Categoria elimidada com sucesso!',
+          });
+          onRefetch();
+          onClose();
+        },
+        onError: (e: any) => {
+          toast({
+            duration: 3000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'error',
+            title:
+              e?.response?.data?.message ??
+              'Ocorreu um erro ao eliminar categoria!',
+          });
+        },
+      });
+    }
+  }, [mutate, onClose, onRefetch, selectedProductCategory, toast]);
 
   return (
     <Flex p={10} alignItems="center">
@@ -146,6 +181,11 @@ export const ProductCategoriesTable = ({
                             variant="ghost"
                             aria-label="deletar"
                             icon={<FiTrash2 />}
+                            isLoading={
+                              isDeletting &&
+                              pc.pkProductCategory ===
+                                selectedProductCategory?.pkProductCategory
+                            }
                             onClick={() => onDelete(pc)}
                           />
                         </Td>
@@ -183,14 +223,23 @@ export const ProductCategoriesTable = ({
 
             <AlertDialogBody>
               Deseja eliminar a categoria
-              <b> {selectedProducts?.name}</b>?
+              <b> {selectedProductCategory?.name}</b>?
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button mr={3} ref={cancelRef as any} onClick={onClose}>
+              <Button
+                mr={3}
+                ref={cancelRef as any}
+                onClick={onClose}
+                disabled={isDeletting}
+              >
                 Não
               </Button>
-              <Button colorScheme="red" onClick={handleConfirmClose}>
+              <Button
+                colorScheme="red"
+                onClick={handleConfirmClose}
+                isLoading={isDeletting}
+              >
                 Sim
               </Button>
             </AlertDialogFooter>

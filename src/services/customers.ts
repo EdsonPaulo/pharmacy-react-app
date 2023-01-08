@@ -40,3 +40,8 @@ export const putEditCustomer: TPutEditCustomer = async ({
   const response = await APIConnector.put(`/customer/${customerId}`, customer);
   return toCamelCase(response.data?.data) as ICustomer;
 };
+
+export const deleteCustomer = async (customerId: number) => {
+  const response = await APIConnector.delete(`/customer/${customerId}`);
+  return toCamelCase(response.data?.data) as ICustomer;
+};

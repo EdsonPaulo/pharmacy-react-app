@@ -59,6 +59,7 @@ export const ProductsList = () => {
         onAddNew={handleAddProduct}
         onView={handleViewProduct}
         onEdit={handleEditProduct}
+        onRefetch={handleRefetch}
       />
 
       <Modal

@@ -59,6 +59,7 @@ export const EmployeesPage = () => {
         onAddNew={handleAddEmployee}
         onView={handleViewEmployee}
         onEdit={handleEditEmployee}
+        onRefetch={handleRefetch}
       />
 
       <Modal

@@ -16,6 +16,8 @@
     "@fontsource/poppins": "^4.5.10",
     "@fontsource/roboto": "^4.5.8",
     "@fontsource/roboto-slab": "^4.5.9",
+    "@nivo/core": "^0.80.0",
+    "@nivo/pie": "^0.80.0",
     "axios": "^1.2.1",
     "formik": "^2.2.9",
     "framer-motion": "^6.5.1",

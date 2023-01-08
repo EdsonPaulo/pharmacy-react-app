@@ -19,3 +19,8 @@ export const postCreateUser: TPostCreateUser = async (payload) => {
   const response = await APIConnector.post('/user', payload);
   return toCamelCase(response.data?.data) as IUser;
 };
+
+export const deleteUser = async (userId: number) => {
+  const response = await APIConnector.delete(`/user/${userId}`);
+  return toCamelCase(response.data?.data) as IUser;
+};

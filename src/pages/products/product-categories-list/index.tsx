@@ -63,6 +63,7 @@ export const ProductCategoriesList = () => {
         onAddNew={handleAddProductCategory}
         onView={handleViewProductCategory}
         onEdit={handleEditProductCategory}
+        onRefetch={handleRefetch}
       />
 
       <Modal

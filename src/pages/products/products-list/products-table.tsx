@@ -23,9 +23,12 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useMutation } from 'react-query';
+import { deleteProduct } from '../../../services/products';
 import { IProduct } from '../../../typescript/types';
 
 interface ProductsTableProps {
@@ -33,6 +36,7 @@ interface ProductsTableProps {
   isEmpty: boolean;
   products?: IProduct[];
   onAddNew: () => void;
+  onRefetch: () => void;
   onView: (product: IProduct) => void;
   onEdit: (product: IProduct) => void;
 }
@@ -44,23 +48,53 @@ export const ProductsTable = ({
   onAddNew,
   onView,
   onEdit,
+  onRefetch,
 }: ProductsTableProps) => {
   const cancelRef = useRef();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedProducts, setSelectedProducts] = useState<IProduct>();
+  const [selectedProduct, setSelectedProduct] = useState<IProduct>();
+  const { mutate, isLoading: isDeletting } = useMutation(
+    'delete-product',
+    deleteProduct,
+  );
 
   const onDelete = useCallback(
     (product: IProduct) => {
-      setSelectedProducts(product);
+      setSelectedProduct(product);
       onOpen();
     },
     [onOpen],
   );
 
   const handleConfirmClose = useCallback(() => {
-    // delete product
-    onClose();
-  }, [onClose]);
+    if (selectedProduct) {
+      mutate(selectedProduct?.pkProduct, {
+        onSuccess: () => {
+          toast({
+            duration: 2000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'success',
+            title: 'Produto elimidado com sucesso!',
+          });
+          onRefetch();
+          onClose();
+        },
+        onError: (e: any) => {
+          toast({
+            duration: 3000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'error',
+            title:
+              e?.response?.data?.message ??
+              'Ocorreu um erro ao eliminar produto!',
+          });
+        },
+      });
+    }
+  }, [mutate, onClose, onRefetch, selectedProduct, toast]);
 
   return (
     <Flex p={10} alignItems="center">
@@ -153,6 +187,10 @@ export const ProductsTable = ({
                             aria-label="deletar"
                             icon={<FiTrash2 />}
                             onClick={() => onDelete(p)}
+                            isLoading={
+                              isDeletting &&
+                              p.pkProduct === selectedProduct?.pkProduct
+                            }
                           />
                         </Td>
                       </Tr>
@@ -189,14 +227,23 @@ export const ProductsTable = ({
 
             <AlertDialogBody>
               Deseja eliminar o produto
-              <b> {selectedProducts?.name}</b>?
+              <b> {selectedProduct?.name}</b>?
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button mr={3} ref={cancelRef as any} onClick={onClose}>
+              <Button
+                mr={3}
+                ref={cancelRef as any}
+                onClick={onClose}
+                disabled={isDeletting}
+              >
                 Não
               </Button>
-              <Button colorScheme="red" onClick={handleConfirmClose}>
+              <Button
+                colorScheme="red"
+                onClick={handleConfirmClose}
+                isLoading={isDeletting}
+              >
                 Sim
               </Button>
             </AlertDialogFooter>

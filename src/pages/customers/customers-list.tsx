@@ -23,9 +23,12 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useMutation } from 'react-query';
+import { deleteCustomer } from '../../services/customers';
 import { ICustomer } from '../../typescript/types';
 
 interface CustomersListProps {
@@ -33,6 +36,7 @@ interface CustomersListProps {
   isEmpty: boolean;
   customers?: ICustomer[];
   onAddNew: () => void;
+  onRefetch: () => void;
   onView: (customer: ICustomer) => void;
   onEdit: (customer: ICustomer) => void;
 }
@@ -44,10 +48,16 @@ export const CustomersList = ({
   onAddNew,
   onView,
   onEdit,
+  onRefetch,
 }: CustomersListProps) => {
   const cancelRef = useRef();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedCustomer, setSelectedCustomer] = useState<ICustomer>();
+  const { mutate, isLoading: isDeletting } = useMutation(
+    'delete-customer',
+    deleteCustomer,
+  );
 
   const onDelete = useCallback(
     (customer: ICustomer) => {
@@ -58,9 +68,33 @@ export const CustomersList = ({
   );
 
   const handleConfirmClose = useCallback(() => {
-    // delete customer
-    onClose();
-  }, [onClose]);
+    if (selectedCustomer) {
+      mutate(selectedCustomer?.pkCustomer, {
+        onSuccess: () => {
+          toast({
+            duration: 2000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'success',
+            title: 'Cliente elimidado com sucesso!',
+          });
+          onRefetch();
+          onClose();
+        },
+        onError: (e: any) => {
+          toast({
+            duration: 3000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'error',
+            title:
+              e?.response?.data?.message ??
+              'Ocorreu um erro ao eliminar cliente!',
+          });
+        },
+      });
+    }
+  }, [mutate, onClose, onRefetch, selectedCustomer, toast]);
 
   return (
     <Flex p={10} alignItems="center">
@@ -153,6 +187,10 @@ export const CustomersList = ({
                             aria-label="deletar"
                             icon={<FiTrash2 />}
                             onClick={() => onDelete(c)}
+                            isLoading={
+                              isDeletting &&
+                              c.pkCustomer === selectedCustomer?.pkCustomer
+                            }
                           />
                         </Td>
                       </Tr>
@@ -193,10 +231,19 @@ export const CustomersList = ({
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button mr={3} ref={cancelRef as any} onClick={onClose}>
+              <Button
+                mr={3}
+                ref={cancelRef as any}
+                onClick={onClose}
+                disabled={isDeletting}
+              >
                 Não
               </Button>
-              <Button colorScheme="red" onClick={handleConfirmClose}>
+              <Button
+                colorScheme="red"
+                onClick={handleConfirmClose}
+                isLoading={isDeletting}
+              >
                 Sim
               </Button>
             </AlertDialogFooter>

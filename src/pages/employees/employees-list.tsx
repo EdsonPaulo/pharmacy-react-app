@@ -23,9 +23,12 @@ import {
   Thead,
   Tr,
   useDisclosure,
+  useToast,
 } from '@chakra-ui/react';
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
+import { useMutation } from 'react-query';
+import { deleteEmployee } from '../../services/employees';
 import { IEmployee } from '../../typescript/types';
 
 interface EmployeesListProps {
@@ -33,6 +36,7 @@ interface EmployeesListProps {
   isEmpty: boolean;
   employees?: IEmployee[];
   onAddNew: () => void;
+  onRefetch: () => void;
   onView: (employee: IEmployee) => void;
   onEdit: (employee: IEmployee) => void;
 }
@@ -44,10 +48,16 @@ export const EmployeesList = ({
   onAddNew,
   onView,
   onEdit,
+  onRefetch,
 }: EmployeesListProps) => {
   const cancelRef = useRef();
+  const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedEmployee, setSelectedEmployee] = useState<IEmployee>();
+  const { mutate, isLoading: isDeletting } = useMutation(
+    'delete-employee',
+    deleteEmployee,
+  );
 
   const onDelete = useCallback(
     (employee: IEmployee) => {
@@ -58,9 +68,33 @@ export const EmployeesList = ({
   );
 
   const handleConfirmClose = useCallback(() => {
-    // delete employee
-    onClose();
-  }, [onClose]);
+    if (selectedEmployee) {
+      mutate(selectedEmployee?.pkEmployee, {
+        onSuccess: () => {
+          toast({
+            duration: 2000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'success',
+            title: 'Funcionário elimidado com sucesso!',
+          });
+          onRefetch();
+          onClose();
+        },
+        onError: (e: any) => {
+          toast({
+            duration: 3000,
+            position: 'top-right',
+            variant: 'subtle',
+            status: 'error',
+            title:
+              e?.response?.data?.message ??
+              'Ocorreu um erro ao eliminar funcionário!',
+          });
+        },
+      });
+    }
+  }, [mutate, onClose, onRefetch, selectedEmployee, toast]);
 
   return (
     <Flex p={10} alignItems="center">
@@ -121,15 +155,15 @@ export const EmployeesList = ({
                   </Th>
                 ) : (
                   <Tbody>
-                    {employees?.map((c) => (
-                      <Tr key={c.pkEmployee}>
-                        <Td>{c.pkEmployee}</Td>
-                        <Td>{c?.name}</Td>
-                        <Td>{c.email ?? '-'}</Td>
-                        <Td>{c.phone ?? '-'}</Td>
+                    {employees?.map((e) => (
+                      <Tr key={e.pkEmployee}>
+                        <Td>{e.pkEmployee}</Td>
+                        <Td>{e?.name}</Td>
+                        <Td>{e.email ?? '-'}</Td>
+                        <Td>{e.phone ?? '-'}</Td>
                         <Td>
-                          {c.createdAt
-                            ? new Date(c.createdAt).toLocaleDateString('pt-BR')
+                          {e.createdAt
+                            ? new Date(e.createdAt).toLocaleDateString('pt-BR')
                             : '-'}
                         </Td>
                         <Td>
@@ -138,21 +172,25 @@ export const EmployeesList = ({
                             variant="ghost"
                             aria-label="visualizar"
                             icon={<FiEye />}
-                            onClick={() => onView(c)}
+                            onClick={() => onView(e)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="editar"
                             icon={<FiEdit />}
-                            onClick={() => onEdit(c)}
+                            onClick={() => onEdit(e)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="deletar"
                             icon={<FiTrash2 />}
-                            onClick={() => onDelete(c)}
+                            isLoading={
+                              isDeletting &&
+                              e.pkEmployee === selectedEmployee?.pkEmployee
+                            }
+                            onClick={() => onDelete(e)}
                           />
                         </Td>
                       </Tr>
@@ -193,10 +231,19 @@ export const EmployeesList = ({
             </AlertDialogBody>
 
             <AlertDialogFooter>
-              <Button mr={3} ref={cancelRef as any} onClick={onClose}>
+              <Button
+                mr={3}
+                ref={cancelRef as any}
+                disabled={isDeletting}
+                onClick={onClose}
+              >
                 Não
               </Button>
-              <Button colorScheme="red" onClick={handleConfirmClose}>
+              <Button
+                colorScheme="red"
+                isLoading={isDeletting}
+                onClick={handleConfirmClose}
+              >
                 Sim
               </Button>
             </AlertDialogFooter>

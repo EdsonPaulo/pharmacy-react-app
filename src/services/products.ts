@@ -23,6 +23,11 @@ export const postCreateProduct: TPostCreateProduct = async (payload) => {
   return toCamelCase(response.data?.data) as IProduct;
 };
 
+export const deleteProduct = async (productId: number) => {
+  const response = await APIConnector.delete(`/product/${productId}`);
+  return toCamelCase(response.data?.data) as IProduct;
+};
+
 /** Product Categories **/
 
 export const getProductCategories = async (): Promise<IProductCategory[]> => {
@@ -38,5 +43,12 @@ export const postCreateProductCategory: TPostCreateProductCategory = async (
   payload,
 ) => {
   const response = await APIConnector.post('/product-category', payload);
+  return toCamelCase(response.data?.data) as IProductCategory;
+};
+
+export const deleteProductCategory = async (productCategoryId: number) => {
+  const response = await APIConnector.delete(
+    `/product-category/${productCategoryId}`,
+  );
   return toCamelCase(response.data?.data) as IProductCategory;
 };
