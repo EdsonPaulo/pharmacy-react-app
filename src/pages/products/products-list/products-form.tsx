@@ -176,6 +176,7 @@ export const ProductsForm = ({
                   value={values.product_category}
                   placeholder="Selecione um opção"
                   onChange={handleChange}
+                  isDisabled={isLoadingCategories}
                 >
                   {productCategories.map((pc) => (
                     <option
