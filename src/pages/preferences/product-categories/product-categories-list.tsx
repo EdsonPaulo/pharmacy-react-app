@@ -28,55 +28,56 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useMutation } from 'react-query';
-import { deleteProduct } from '../../../services/products';
-import { IProduct } from '../../../typescript/types';
+import { deleteProductCategory } from '../../../services/products';
+import { IProductCategory } from '../../../typescript/types';
 
-interface ProductsTableProps {
+interface ProductCategoriesListProps {
   isLoading: boolean;
   isEmpty: boolean;
-  products?: IProduct[];
+  productCategories?: IProductCategory[];
   onAddNew: () => void;
   onRefetch: () => void;
-  onView: (product: IProduct) => void;
-  onEdit: (product: IProduct) => void;
+  onView: (product: IProductCategory) => void;
+  onEdit: (product: IProductCategory) => void;
 }
 
-export const ProductsTable = ({
-  products = [],
+export const ProductCategoriesList = ({
+  productCategories = [],
   isLoading,
   isEmpty,
   onAddNew,
   onView,
   onEdit,
   onRefetch,
-}: ProductsTableProps) => {
+}: ProductCategoriesListProps) => {
   const cancelRef = useRef();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedProduct, setSelectedProduct] = useState<IProduct>();
+  const [selectedProductCategory, setSelectedProductCategory] =
+    useState<IProductCategory>();
   const { mutate, isLoading: isDeletting } = useMutation(
-    'delete-product',
-    deleteProduct,
+    'delete-product-category',
+    deleteProductCategory,
   );
 
   const onDelete = useCallback(
-    (product: IProduct) => {
-      setSelectedProduct(product);
+    (productCategory: IProductCategory) => {
+      setSelectedProductCategory(productCategory);
       onOpen();
     },
     [onOpen],
   );
 
   const handleConfirmClose = useCallback(() => {
-    if (selectedProduct) {
-      mutate(selectedProduct?.pkProduct, {
+    if (selectedProductCategory) {
+      mutate(selectedProductCategory?.pkProductCategory, {
         onSuccess: () => {
           toast({
             duration: 2000,
             position: 'top-right',
             variant: 'subtle',
             status: 'success',
-            title: 'Produto elimidado com sucesso!',
+            title: 'Categoria elimidada com sucesso!',
           });
           onRefetch();
           onClose();
@@ -89,12 +90,12 @@ export const ProductsTable = ({
             status: 'error',
             title:
               e?.response?.data?.message ??
-              'Ocorreu um erro ao eliminar produto!',
+              'Ocorreu um erro ao eliminar categoria!',
           });
         },
       });
     }
-  }, [mutate, onClose, onRefetch, selectedProduct, toast]);
+  }, [mutate, onClose, onRefetch, selectedProductCategory, toast]);
 
   return (
     <Flex p={10} alignItems="center">
@@ -118,7 +119,7 @@ export const ProductsTable = ({
           <Box>
             <Flex justifyContent="space-between" p={6} alignItems="center">
               <Heading as="h1" fontSize={18} color="brand.primary">
-                Produtos
+                Categorias de produtos
               </Heading>
 
               <Button
@@ -138,15 +139,13 @@ export const ProductsTable = ({
                   <Tr bg="#C4C4C4">
                     <Th>#</Th>
                     <Th>Nome</Th>
-                    <Th>Categoria</Th>
-                    <Th>Preço</Th>
-                    <Th>Data Expiração</Th>
+                    <Th>Data criação</Th>
                     <Th>Ações</Th>
                   </Tr>
                 </Thead>
 
                 {isEmpty ? (
-                  <Th colSpan={6}>
+                  <Th colSpan={4}>
                     <Center minH={350}>
                       <Text color="blackAlpha.500" textAlign="center">
                         Sem dados para mostrar!
@@ -155,16 +154,12 @@ export const ProductsTable = ({
                   </Th>
                 ) : (
                   <Tbody>
-                    {products?.map((p) => (
-                      <Tr key={p.pkProduct}>
-                        <Td>{p.pkProduct}</Td>
-                        <Td>{p?.name}</Td>
-                        <Td>{p.productCategory?.name}</Td>
-                        <Td>{p.price}</Td>
+                    {productCategories?.map((pc) => (
+                      <Tr key={pc.pkProductCategory}>
+                        <Td>{pc.pkProductCategory}</Td>
+                        <Td>{pc?.name}</Td>
                         <Td>
-                          {new Date(p.expirationDate).toLocaleDateString(
-                            'pt-PT',
-                          )}
+                          {new Date(pc.createdAt).toLocaleDateString('pt-PT')}
                         </Td>
                         <Td>
                           <IconButton
@@ -172,25 +167,26 @@ export const ProductsTable = ({
                             variant="ghost"
                             aria-label="visualizar"
                             icon={<FiEye />}
-                            onClick={() => onView(p)}
+                            onClick={() => onView(pc)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="editar"
                             icon={<FiEdit />}
-                            onClick={() => onEdit(p)}
+                            onClick={() => onEdit(pc)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="deletar"
                             icon={<FiTrash2 />}
-                            onClick={() => onDelete(p)}
                             isLoading={
                               isDeletting &&
-                              p.pkProduct === selectedProduct?.pkProduct
+                              pc.pkProductCategory ===
+                                selectedProductCategory?.pkProductCategory
                             }
+                            onClick={() => onDelete(pc)}
                           />
                         </Td>
                       </Tr>
@@ -201,9 +197,9 @@ export const ProductsTable = ({
                 {!isEmpty && (
                   <>
                     <Tfoot></Tfoot>
-                    {products?.length > 5 && (
+                    {productCategories?.length > 5 && (
                       <TableCaption mt={4} pb={6}>
-                        Tabela de produtos no sistema
+                        Tabela de categorias de produtos no sistema
                       </TableCaption>
                     )}
                   </>
@@ -222,12 +218,12 @@ export const ProductsTable = ({
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Eliminar Produto
+              Eliminar Categoria
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Deseja eliminar o produto
-              <b> {selectedProduct?.name}</b>?
+              Deseja eliminar a categoria
+              <b> {selectedProductCategory?.name}</b>?
             </AlertDialogBody>
 
             <AlertDialogFooter>

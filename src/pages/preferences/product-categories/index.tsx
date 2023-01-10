@@ -1,36 +1,40 @@
 import { Box, Modal, ModalOverlay, useDisclosure } from '@chakra-ui/react';
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { getProducts } from '../../../services/products';
-import { IProduct } from '../../../typescript/types';
-import { ProductsForm } from './products-form';
-import { ProductsTable } from './products-table';
+import { getProductCategories } from '../../../services/products';
+import { IProductCategory } from '../../../typescript/types';
+import { ProductCategoryForm } from './product-categories-form';
+import { ProductCategoriesList } from './product-categories-list';
 
-export const ProductsList = () => {
-  const { data, isLoading, refetch } = useQuery('products', getProducts);
+export const ProductCategoriesPage = () => {
+  const { data, isLoading, refetch } = useQuery(
+    'product-categories',
+    getProductCategories,
+  );
   const { isOpen: isFormOpen, onOpen: openForm, onClose } = useDisclosure();
-  const [selectedProduct, setSelectedProduct] = useState<IProduct>();
+  const [selectedProductCategory, setSelectedProductCategory] =
+    useState<IProductCategory>();
   const [formMode, setFormMode] = useState<'edit' | 'view'>('view');
 
-  const handleAddProduct = useCallback(() => {
+  const handleAddProductCategory = useCallback(() => {
     setFormMode('edit');
-    setSelectedProduct(undefined);
+    setSelectedProductCategory(undefined);
     openForm();
   }, [openForm]);
 
-  const handleViewProduct = useCallback(
-    (user: IProduct) => {
-      setSelectedProduct(user);
+  const handleViewProductCategory = useCallback(
+    (user: IProductCategory) => {
+      setSelectedProductCategory(user);
       setFormMode('view');
       openForm();
     },
     [openForm],
   );
 
-  const handleEditProduct = useCallback(
-    (user: IProduct) => {
+  const handleEditProductCategory = useCallback(
+    (user: IProductCategory) => {
       setFormMode('edit');
-      setSelectedProduct(user);
+      setSelectedProductCategory(user);
       openForm();
     },
     [openForm],
@@ -38,7 +42,7 @@ export const ProductsList = () => {
 
   const handleCloseModal = useCallback(() => {
     onClose();
-    setSelectedProduct(undefined);
+    setSelectedProductCategory(undefined);
   }, [onClose]);
 
   const handleRefetch = useCallback(() => {
@@ -52,13 +56,13 @@ export const ProductsList = () => {
 
   return (
     <Box flex={1} p={10}>
-      <ProductsTable
-        products={data}
+      <ProductCategoriesList
         isEmpty={isEmpty}
         isLoading={isLoading}
-        onAddNew={handleAddProduct}
-        onView={handleViewProduct}
-        onEdit={handleEditProduct}
+        productCategories={data}
+        onAddNew={handleAddProductCategory}
+        onView={handleViewProductCategory}
+        onEdit={handleEditProductCategory}
         onRefetch={handleRefetch}
       />
 
@@ -71,11 +75,11 @@ export const ProductsList = () => {
       >
         <ModalOverlay />
 
-        <ProductsForm
+        <ProductCategoryForm
           mode={formMode}
-          selectedProduct={selectedProduct}
           onClose={handleCloseModal}
           onRefetch={handleRefetch}
+          selectedProductCategory={selectedProductCategory}
         />
       </Modal>
     </Box>

@@ -1,6 +1,11 @@
-import { BsCardChecklist } from 'react-icons/bs';
-import { FiBriefcase, FiGrid, FiSettings, FiUsers } from 'react-icons/fi';
+import { BiReceipt } from 'react-icons/bi';
+import { BsBuilding } from 'react-icons/bs';
+import { FiGrid, FiSettings } from 'react-icons/fi';
 import { GiPill } from 'react-icons/gi';
+import { GoPackage } from 'react-icons/go';
+import { HiOutlineUserGroup, HiOutlineUsers } from 'react-icons/hi';
+import { RiUserSettingsLine } from 'react-icons/ri';
+
 import { ROUTES } from '../../constants/routes';
 
 export const AdminMenu = [
@@ -8,43 +13,53 @@ export const AdminMenu = [
     title: 'Menu Principal',
     children: [
       {
-        title: 'dashboard',
+        title: 'Dashboard',
         path: ROUTES.Dashboard,
         icon: FiGrid,
       },
       {
-        title: 'encomendas',
+        title: 'Vendas',
         path: ROUTES.Orders,
-        icon: BsCardChecklist,
+        icon: BiReceipt,
       },
       {
-        title: 'produtos',
+        title: 'Produtos',
         path: ROUTES.Products,
         icon: GiPill,
       },
       {
+        title: 'Entradas',
+        path: ROUTES.Purchases,
+        icon: GoPackage,
+      },
+      {
         title: 'Clientes',
         path: ROUTES.Customers,
-        icon: FiUsers,
+        icon: HiOutlineUsers,
       },
       {
         title: 'Funcionários',
         path: ROUTES.Employees,
-        icon: FiBriefcase,
+        icon: HiOutlineUserGroup,
+      },
+      {
+        title: 'Fornecedores',
+        path: ROUTES.Suppliers,
+        icon: BsBuilding,
       },
     ],
   },
   {
-    title: 'Preferências',
+    title: 'Outros',
     children: [
       {
         title: 'Utilizadores',
         path: ROUTES.Users,
-        icon: FiUsers,
+        icon: RiUserSettingsLine,
       },
       {
-        title: 'Configurações',
-        path: ROUTES.Settings,
+        title: 'Preferências',
+        path: ROUTES.Preferences,
         icon: FiSettings,
       },
     ],

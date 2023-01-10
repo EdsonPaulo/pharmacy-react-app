@@ -59,7 +59,7 @@ export const SidebarMenu = () => {
                   }
                   _hover={{ background: 'brand.primaryDark' }}
                 >
-                  <Icon mr={3} as={menuItem.icon} boxSize={4} color="white" />
+                  <Icon mr={3} as={menuItem.icon} boxSize={5} color="white" />
                   <Text
                     fontWeight="600"
                     fontSize={13}

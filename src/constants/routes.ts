@@ -4,11 +4,12 @@ export const ROUTES = {
   Dashboard: '/dashboard',
   Customers: '/clientes',
   Employees: '/funcionarios',
-  Orders: '/encomendas',
+  Orders: '/vendas',
   Products: '/produtos',
-
-  Users: '/preferencias/utilizadores',
-  Settings: '/preferencias/configuracoes',
+  Suppliers: '/fornecedores',
+  Purchases: '/entradas',
+  Users: '/utilizadores',
+  Preferences: '/preferencias',
 };
 
 export const AUTH_ROUTES = {

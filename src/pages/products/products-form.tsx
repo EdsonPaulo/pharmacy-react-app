@@ -20,10 +20,10 @@ import { useMutation, useQuery } from 'react-query';
 import {
   getProductCategories,
   postCreateProduct,
-} from '../../../services/products';
+} from '../../services/products';
 import { useFormik } from 'formik';
 import { newProductSchema } from './products.helpers';
-import { IProduct } from '../../../typescript/types';
+import { IProduct } from '../../typescript/types';
 
 interface ProductsFormProps {
   mode: 'edit' | 'view';

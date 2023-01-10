@@ -97,7 +97,7 @@ export const HeaderBar = () => {
           </Box>
 
           <MenuDivider />
-          <Link as={RouterLink} to={ROUTES.Settings} textDecoration="none">
+          <Link as={RouterLink} to={ROUTES.Preferences} textDecoration="none">
             <MenuItem icon={<FiSettings size={16} />} fontSize="sm">
               Configurações
             </MenuItem>
