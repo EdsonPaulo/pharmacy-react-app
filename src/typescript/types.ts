@@ -57,3 +57,16 @@ export interface IProduct {
   fkProductCategory: number;
   productCategory: IProductCategory;
 }
+
+export interface IOrder {
+  pkOrder: number;
+  total: number;
+  customer: ICustomer;
+  address: IAddress;
+  employee: IEmployee;
+  products: IProduct[];
+  orderDate: string;
+  observation: string;
+  createdAt: string;
+  updatedAt: string;
+}

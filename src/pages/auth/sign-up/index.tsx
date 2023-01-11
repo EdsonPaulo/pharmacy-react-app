@@ -9,6 +9,8 @@ import {
   InputRightElement,
   Link,
   Text,
+  Alert,
+  AlertIcon,
 } from '@chakra-ui/react';
 import { useState } from 'react';
 import { FiEye, FiEyeOff } from 'react-icons/fi';
@@ -34,6 +36,11 @@ export const SignUpPage = () => {
 
       <Flex bg="white" flex={0.5} p={20} alignItems="center">
         <Box w="100%">
+          <Alert status="warning" mb={4}>
+            <AlertIcon />A criação de conta está bloqueada temporariamente
+            porque o sistema está em desenvolvimento
+          </Alert>
+
           <Text fontSize="2xl" as="b">
             Criar Conta
           </Text>
@@ -97,7 +104,8 @@ export const SignUpPage = () => {
             colorScheme="teal"
             isLoading={isLoading}
             disabled={
-              !formData?.name || !formData?.email || !formData?.password
+              //! formData?.name || !formData?.email || !formData?.password
+              true
             }
             onClick={() => handleSignUp()}
           >

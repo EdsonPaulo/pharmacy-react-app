@@ -19,8 +19,8 @@ export const EmployeesPage = () => {
   }, [openForm]);
 
   const handleViewEmployee = useCallback(
-    (customer: IEmployee) => {
-      setSelectedEmployee(customer);
+    (employee: IEmployee) => {
+      setSelectedEmployee(employee);
       setFormMode('view');
       openForm();
     },
@@ -28,9 +28,9 @@ export const EmployeesPage = () => {
   );
 
   const handleEditEmployee = useCallback(
-    (customer: IEmployee) => {
+    (employee: IEmployee) => {
       setFormMode('edit');
-      setSelectedEmployee(customer);
+      setSelectedEmployee(employee);
       openForm();
     },
     [openForm],
