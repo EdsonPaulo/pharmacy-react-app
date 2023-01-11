@@ -1,3 +1,6 @@
+![Captura de ecrã 2023-01-11, às 11 18 06](https://user-images.githubusercontent.com/18505083/211780792-40953004-c33b-457b-a67d-e3b5074eb08c.png)
+
+
 This project was bootstrapped with
 [Create React App](https://github.com/facebook/create-react-app).
 
