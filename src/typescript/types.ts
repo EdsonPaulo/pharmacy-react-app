@@ -10,7 +10,8 @@ export interface IAddress {
   updatedAt: string;
 }
 
-export interface IGeneralUser {
+export interface IPerson {
+  pkPerson: number;
   name: string;
   email: string;
   bi?: string;
@@ -19,6 +20,7 @@ export interface IGeneralUser {
   address?: IAddress;
   createdAt: string;
   updatedAt: string;
+  user?: IUser;
 }
 
 export interface IUser {
@@ -26,15 +28,7 @@ export interface IUser {
   email: string;
   accessToken: string;
   userType: UserTypeEnum;
-  personalInfo: ICustomer | IEmployee | null;
-}
-
-export interface ICustomer extends IGeneralUser {
-  pkCustomer: number;
-}
-
-export interface IEmployee extends IGeneralUser {
-  pkEmployee: number;
+  personalInfo: IPerson | null;
 }
 
 export interface IProductCategory {
@@ -42,6 +36,8 @@ export interface IProductCategory {
   name: string;
   createdAt: string;
   updatedAt: string;
+  fkProductCategory: number;
+  productCategory: IProductCategory;
 }
 
 export interface IProduct {
@@ -49,6 +45,7 @@ export interface IProduct {
   name: string;
   price: number;
   description: string;
+  image: string;
   stock: number;
   manufactureDate: string;
   expirationDate: string;
@@ -61,9 +58,9 @@ export interface IProduct {
 export interface IOrder {
   pkOrder: number;
   total: number;
-  customer: ICustomer;
   address: IAddress;
-  employee: IEmployee;
+  customer: IPerson;
+  employee: IPerson;
   products: IProduct[];
   orderDate: string;
   observation: string;

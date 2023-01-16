@@ -2,8 +2,8 @@ import axios from 'axios';
 import NProgress from 'nprogress';
 
 export const APIConnector = axios.create({
-  baseURL:
-    'https://pharmacy-web-server.onrender.com' ?? 'http://localhost:2000',
+  baseURL: 'https://pharmacy-web-server.onrender.com',
+  // 'http://localhost:2000',
 });
 
 APIConnector.interceptors.request.use(

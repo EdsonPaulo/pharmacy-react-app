@@ -5,9 +5,9 @@ import { UserTypeEnum } from '../../typescript/enums';
 const REQUIRED_MESSAGE = 'Campo obrigatório';
 
 export const UserTypesMap: Record<UserTypeEnum, string> = {
-  customer: 'Cliente',
-  admin: 'Administrador',
-  employee: 'Funcionário',
+  CUSTOMER: 'Cliente',
+  ADMIN: 'Administrador',
+  EMPLOYEE: 'Funcionário',
 };
 
 export const newUserSchema = Yup.object().shape({

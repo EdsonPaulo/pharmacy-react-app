@@ -92,8 +92,7 @@ export const AuthProvider = (props: any) => {
           position: 'top-right',
           variant: 'subtle',
           status: 'error',
-          title:
-            e?.response?.data?.message ?? 'Email ou Palavra-passe inválidos',
+          title: e?.response?.data?.message ?? 'Email ou palavra-passe errada!',
         });
       },
     });

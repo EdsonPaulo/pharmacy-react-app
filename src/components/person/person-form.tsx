@@ -20,40 +20,44 @@ import {
 } from '@chakra-ui/react';
 import { useCallback, useMemo } from 'react';
 import { useMutation } from 'react-query';
-import { postCreateCustomer, putEditCustomer } from '../../services/customers';
-import { useFormik } from 'formik';
-import { customerSchema } from './customers.helpers';
-import { ICustomer } from '../../typescript/types';
-import AngolaCities from '../../constants/angolan-cities.json';
 
-interface CustomersFormProps {
+import { postCreatePerson, putEditPerson } from '../../services/person';
+import { useFormik } from 'formik';
+import { personSchema } from './person.helpers';
+import { IPerson } from '../../typescript/types';
+import AngolaCities from '../../constants/angolan-cities.json';
+import { UserTypeEnum } from '../../typescript/enums';
+import { UserTypesMap } from '../../pages/users/users.helpers';
+interface PersonFormProps {
   mode: 'edit' | 'view';
-  selectedCustomer?: ICustomer;
+  selectedPerson?: IPerson;
   onClose: () => void;
   onRefetch: () => void;
+  personType: UserTypeEnum;
 }
 
-export const CustomersForm = ({
-  selectedCustomer,
+export const PersonForm = ({
+  selectedPerson,
   mode,
   onClose,
   onRefetch,
-}: CustomersFormProps) => {
+  personType,
+}: PersonFormProps) => {
   const toast = useToast();
-  const { isLoading, mutate: mutateAddCustomer } = useMutation(
-    'create-customer',
-    postCreateCustomer,
+  const { isLoading, mutate: mutateAddPerson } = useMutation(
+    `create-person-${personType}`,
+    postCreatePerson,
   );
-  const { isLoading: isEditting, mutate: mutateEditCustomer } = useMutation(
-    'edit-customer',
-    putEditCustomer,
+  const { isLoading: isEditting, mutate: mutateEditPerson } = useMutation(
+    `edit-person-${personType}`,
+    putEditPerson,
   );
 
   const isViewMode = useMemo(() => mode === 'view', [mode]);
 
   const isEditMode = useMemo(
-    () => mode === 'edit' && !!selectedCustomer?.pkCustomer,
-    [mode, selectedCustomer],
+    () => mode === 'edit' && !!selectedPerson?.pkPerson,
+    [mode, selectedPerson],
   );
 
   const luandaCities = useMemo(
@@ -70,7 +74,9 @@ export const CustomersForm = ({
         position: 'top-right',
         variant: 'subtle',
         status: 'success',
-        title: `Cliente ${type === 'edit' ? 'editado' : 'criado'} com sucesso!`,
+        title: `Funcionário ${
+          type === 'edit' ? 'editado' : 'criado'
+        } com sucesso!`,
       });
       onRefetch();
       onClose();
@@ -95,27 +101,28 @@ export const CustomersForm = ({
     handleSubmit,
     isValid,
     errors,
+    status,
     touched,
     handleChange,
     resetForm,
     values,
   } = useFormik({
-    validationSchema: customerSchema,
+    validationSchema: personSchema,
     enableReinitialize: true,
     validateOnMount: true,
     validateOnChange: true,
     initialValues: {
-      name: selectedCustomer?.name ?? '',
-      email: selectedCustomer?.email ?? '',
-      bi: selectedCustomer?.bi ?? '',
-      birth_date: selectedCustomer?.birthDate ?? '',
-      phone: selectedCustomer?.phone ?? '',
-      password: selectedCustomer ? '' : '#Abc1234',
-      address: selectedCustomer
+      name: selectedPerson?.name ?? '',
+      email: selectedPerson?.email ?? '',
+      bi: selectedPerson?.bi ?? '',
+      birth_date: selectedPerson?.birthDate ?? '',
+      phone: selectedPerson?.phone ? Number(selectedPerson?.phone) : '',
+      password: '',
+      address: selectedPerson?.address
         ? {
-            name: selectedCustomer?.address?.name ?? '',
-            city: selectedCustomer?.address?.city ?? '',
-            residence: selectedCustomer?.address?.residence ?? '',
+            name: selectedPerson?.address?.name ?? '',
+            city: selectedPerson?.address?.city ?? '',
+            residence: selectedPerson?.address?.residence ?? '',
           }
         : {},
     },
@@ -124,10 +131,13 @@ export const CustomersForm = ({
         ...values,
         address: values?.address?.residence ? values.address : null,
       };
-
-      if (isEditMode && !!selectedCustomer) {
-        mutateEditCustomer(
-          { customer: formData, customerId: selectedCustomer?.pkCustomer },
+      if (isEditMode && !!selectedPerson) {
+        mutateEditPerson(
+          {
+            person: formData as any,
+            personId: selectedPerson?.pkPerson,
+            user_type: personType,
+          },
           {
             onSuccess: () => {
               resetForm();
@@ -136,26 +146,29 @@ export const CustomersForm = ({
             onError: (e: any) => {
               onErrorExtraCallback(
                 e?.response?.data?.message ??
-                  'Ocorreu um erro ao editar cliente',
+                  'Ocorreu um erro ao editar funcionário',
               );
             },
           },
         );
       } else {
-        mutateAddCustomer(formData, {
+        mutateAddPerson(formData as any, {
           onSuccess: () => {
             resetForm();
             onSuccessExtraCallback('create');
           },
           onError: (e: any) => {
             onErrorExtraCallback(
-              e?.response?.data?.message ?? 'Ocorreu um erro ao criar cliente',
+              e?.response?.data?.message ??
+                'Ocorreu um erro ao criar funcionário',
             );
           },
         });
       }
     },
   });
+
+  console.log(errors, touched, status);
 
   const isAddButtonDisabled = useMemo(
     () => isLoading || isEditting || !isValid || isViewMode,
@@ -167,22 +180,30 @@ export const CustomersForm = ({
       <ModalContent>
         <ModalHeader>
           {isViewMode
-            ? selectedCustomer?.name
+            ? selectedPerson?.name
             : isEditMode
-            ? 'Editar Cliente'
-            : 'Novo Cliente'}
+            ? `Editar ${
+                personType === UserTypeEnum.CUSTOMER ? 'Cliente' : 'Funcionário'
+              }`
+            : `Novo ${
+                personType === UserTypeEnum.CUSTOMER ? 'Cliente' : 'Funcionário'
+              }`}
         </ModalHeader>
+
         <ModalCloseButton />
 
         <ModalBody>
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="15px">
             <FormControl
-              isInvalid={!isViewMode && !!errors?.name && !!touched.name}
+              isInvalid={!isViewMode && !!errors?.name}
               isRequired={!isViewMode}
             >
               <FormLabel>Nome Completo</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">{selectedCustomer?.name || '-'}</Text>
+                <Text fontWeight="900">
+                  {selectedPerson?.name || '-'} (
+                  {UserTypesMap[selectedPerson?.user?.userType ?? personType]})
+                </Text>
               ) : (
                 <Input
                   id="name"
@@ -197,11 +218,11 @@ export const CustomersForm = ({
 
             <FormControl
               isRequired={!isViewMode}
-              isInvalid={!isViewMode && !!errors.email && !!touched.email}
+              isInvalid={!isViewMode && !!errors.email}
             >
               <FormLabel>Email</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">{selectedCustomer?.email || '-'}</Text>
+                <Text fontWeight="900">{selectedPerson?.email || '-'}</Text>
               ) : (
                 <Input
                   id="email"
@@ -209,7 +230,7 @@ export const CustomersForm = ({
                   type="email"
                   value={values.email}
                   disabled={isEditMode}
-                  placeholder={'cliente@email.com'}
+                  placeholder={'funcionário@email.com'}
                   onChange={handleChange}
                 />
               )}
@@ -221,12 +242,10 @@ export const CustomersForm = ({
               <FormErrorMessage>{errors.email}</FormErrorMessage>
             </FormControl>
 
-            <FormControl
-              isInvalid={!isViewMode && !!errors.phone && !!touched.phone}
-            >
+            <FormControl isInvalid={!isViewMode && !!errors.phone}>
               <FormLabel>Telefone</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">{selectedCustomer?.phone || '-'}</Text>
+                <Text fontWeight="900">{selectedPerson?.phone || '-'}</Text>
               ) : (
                 <Input
                   id="phone"
@@ -235,6 +254,8 @@ export const CustomersForm = ({
                   value={values.phone}
                   placeholder={'9XX XXX XXX'}
                   onChange={handleChange}
+                  minLength={9}
+                  maxLength={9}
                 />
               )}
 
@@ -244,7 +265,7 @@ export const CustomersForm = ({
             <FormControl isInvalid={!isViewMode && !!errors.bi && !!touched.bi}>
               <FormLabel>Bilhete de identidade</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">{selectedCustomer?.bi || '-'}</Text>
+                <Text fontWeight="900">{selectedPerson?.bi || '-'}</Text>
               ) : (
                 <Input
                   id="bi"
@@ -258,16 +279,12 @@ export const CustomersForm = ({
               <FormErrorMessage>{errors.bi}</FormErrorMessage>
             </FormControl>
 
-            <FormControl
-              isInvalid={
-                !isViewMode && !!errors.birth_date && !!touched.birth_date
-              }
-            >
+            <FormControl isInvalid={!isViewMode && !!errors.birth_date}>
               <FormLabel>Data de nascimento</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedCustomer?.birthDate
-                    ? new Date(selectedCustomer?.birthDate).toLocaleDateString(
+                  {selectedPerson?.birthDate
+                    ? new Date(selectedPerson?.birthDate).toLocaleDateString(
                         'pt-PT',
                       )
                     : '-'}
@@ -286,10 +303,7 @@ export const CustomersForm = ({
             </FormControl>
 
             {!isViewMode && (
-              <FormControl
-                isRequired
-                isInvalid={!!errors?.password && !!touched.password}
-              >
+              <FormControl isRequired isInvalid={!!errors?.password}>
                 <FormLabel>Palavra-Passe</FormLabel>
                 <Input
                   id="password"
@@ -308,8 +322,8 @@ export const CustomersForm = ({
                 <Box>
                   <FormLabel>Data de criação</FormLabel>
                   <Text fontWeight="900">
-                    {selectedCustomer?.createdAt
-                      ? new Date(selectedCustomer?.createdAt).toLocaleString(
+                    {selectedPerson?.createdAt
+                      ? new Date(selectedPerson?.createdAt).toLocaleString(
                           'pt-PT',
                         )
                       : '-'}
@@ -318,8 +332,8 @@ export const CustomersForm = ({
                 <Box>
                   <FormLabel>Última actualização</FormLabel>
                   <Text fontWeight="900">
-                    {selectedCustomer?.updatedAt
-                      ? new Date(selectedCustomer?.updatedAt).toLocaleString(
+                    {selectedPerson?.updatedAt
+                      ? new Date(selectedPerson?.updatedAt).toLocaleString(
                           'pt-PT',
                         )
                       : '-'}
@@ -345,7 +359,7 @@ export const CustomersForm = ({
               <FormLabel>Designação</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedCustomer?.address?.name || '-'}
+                  {selectedPerson?.address?.name || '-'}
                 </Text>
               ) : (
                 <Input
@@ -369,7 +383,7 @@ export const CustomersForm = ({
               <FormLabel>Cidade</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedCustomer?.address?.city || '-'}
+                  {selectedPerson?.address?.city || '-'}
                 </Text>
               ) : (
                 <Select
@@ -399,7 +413,7 @@ export const CustomersForm = ({
               <FormLabel>Endereço</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedCustomer?.address?.residence || '-'}
+                  {selectedPerson?.address?.residence || '-'}
                 </Text>
               ) : (
                 <Input

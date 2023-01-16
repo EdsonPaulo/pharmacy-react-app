@@ -77,7 +77,7 @@ export const ProductCategoryForm = ({
             status: 'error',
             title:
               e?.response?.data?.message ??
-              'Ocorreu um erro ao criar utilizador',
+              'Ocorreu um erro ao criar categoria',
           });
         },
       });

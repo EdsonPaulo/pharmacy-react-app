@@ -21,6 +21,7 @@ import {
   Tfoot,
   Th,
   Thead,
+  Image,
   Tr,
   useDisclosure,
   useToast,
@@ -28,6 +29,7 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useMutation } from 'react-query';
+import { formatMoney } from '../../helpers/numberFormat';
 import { deleteProduct } from '../../services/products';
 import { IProduct } from '../../typescript/types';
 
@@ -137,16 +139,18 @@ export const ProductsList = ({
                 <Thead>
                   <Tr bg="#C4C4C4">
                     <Th>#</Th>
+                    <Th>Imagem</Th>
                     <Th>Nome</Th>
                     <Th>Categoria</Th>
                     <Th>Preço</Th>
+                    <Th>Stock</Th>
                     <Th>Data Expiração</Th>
                     <Th>Ações</Th>
                   </Tr>
                 </Thead>
 
                 {isEmpty ? (
-                  <Th colSpan={6}>
+                  <Th colSpan={8}>
                     <Center minH={350}>
                       <Text color="blackAlpha.500" textAlign="center">
                         Sem dados para mostrar!
@@ -158,13 +162,23 @@ export const ProductsList = ({
                     {products?.map((p) => (
                       <Tr key={p.pkProduct}>
                         <Td>{p.pkProduct}</Td>
-                        <Td>{p?.name}</Td>
-                        <Td>{p.productCategory?.name}</Td>
-                        <Td>{p.price}</Td>
                         <Td>
-                          {new Date(p.expirationDate).toLocaleDateString(
-                            'pt-PT',
-                          )}
+                          <Image
+                            w={'80px'}
+                            h={'80px'}
+                            src={p.image || '/default-image.png'}
+                          />
+                        </Td>
+                        <Td>{p.name ?? '-'}</Td>
+                        <Td>{p.productCategory?.name ?? '-'}</Td>
+                        <Td>{formatMoney(p.price)}</Td>
+                        <Td>{p.stock}</Td>
+                        <Td>
+                          {p.expirationDate
+                            ? new Date(p.expirationDate).toLocaleDateString(
+                                'pt-PT',
+                              )
+                            : '-'}
                         </Td>
                         <Td>
                           <IconButton

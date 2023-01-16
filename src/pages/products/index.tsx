@@ -67,7 +67,7 @@ export const ProductsPage = () => {
         isOpen={isFormOpen}
         onClose={handleCloseModal}
         closeOnOverlayClick={false}
-        size={{ base: 'sm', md: 'lg', lg: 'xl' }}
+        size={{ base: 'sm', md: 'lg', lg: '2xl' }}
       >
         <ModalOverlay />
 

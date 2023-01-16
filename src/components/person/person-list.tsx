@@ -28,55 +28,60 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import { FiEdit, FiEye, FiPlus, FiTrash2 } from 'react-icons/fi';
 import { useMutation } from 'react-query';
-import { deleteCustomer } from '../../services/customers';
-import { ICustomer } from '../../typescript/types';
+import { deletePerson } from '../../services/person';
+import { UserTypeEnum } from '../../typescript/enums';
+import { IPerson } from '../../typescript/types';
 
-interface CustomersListProps {
+interface PersonListProps {
   isLoading: boolean;
   isEmpty: boolean;
-  customers?: ICustomer[];
+  persons?: IPerson[];
+  personType: UserTypeEnum;
   onAddNew: () => void;
   onRefetch: () => void;
-  onView: (customer: ICustomer) => void;
-  onEdit: (customer: ICustomer) => void;
+  onView: (person: IPerson) => void;
+  onEdit: (person: IPerson) => void;
 }
 
-export const CustomersList = ({
-  customers = [],
+export const PersonList = ({
+  persons = [],
   isLoading,
   isEmpty,
   onAddNew,
   onView,
   onEdit,
   onRefetch,
-}: CustomersListProps) => {
+  personType,
+}: PersonListProps) => {
   const cancelRef = useRef();
   const toast = useToast();
   const { isOpen, onOpen, onClose } = useDisclosure();
-  const [selectedCustomer, setSelectedCustomer] = useState<ICustomer>();
+  const [selectedPerson, setSelectedPerson] = useState<IPerson>();
   const { mutate, isLoading: isDeletting } = useMutation(
-    'delete-customer',
-    deleteCustomer,
+    `delete-person-${personType}`,
+    deletePerson,
   );
 
   const onDelete = useCallback(
-    (customer: ICustomer) => {
-      setSelectedCustomer(customer);
+    (person: IPerson) => {
+      setSelectedPerson(person);
       onOpen();
     },
     [onOpen],
   );
 
   const handleConfirmClose = useCallback(() => {
-    if (selectedCustomer) {
-      mutate(selectedCustomer?.pkCustomer, {
+    if (selectedPerson) {
+      mutate(selectedPerson?.pkPerson, {
         onSuccess: () => {
           toast({
             duration: 2000,
             position: 'top-right',
             variant: 'subtle',
             status: 'success',
-            title: 'Cliente elimidado com sucesso!',
+            title: `${
+              personType === UserTypeEnum.CUSTOMER ? 'Cliente' : 'Funcionário'
+            } elimidado com sucesso!`,
           });
           onRefetch();
           onClose();
@@ -89,12 +94,14 @@ export const CustomersList = ({
             status: 'error',
             title:
               e?.response?.data?.message ??
-              'Ocorreu um erro ao eliminar cliente!',
+              `Ocorreu um erro ao eliminar ${
+                personType === UserTypeEnum.CUSTOMER ? 'cliente' : 'funcionário'
+              }!`,
           });
         },
       });
     }
-  }, [mutate, onClose, onRefetch, selectedCustomer, toast]);
+  }, [mutate, onClose, onRefetch, personType, selectedPerson, toast]);
 
   return (
     <Flex p={10} alignItems="center">
@@ -118,7 +125,9 @@ export const CustomersList = ({
           <Box>
             <Flex justifyContent="space-between" p={6} alignItems="center">
               <Heading as="h1" fontSize={18} color="brand.primary">
-                Clientes
+                {personType === UserTypeEnum.CUSTOMER
+                  ? 'Clientes'
+                  : 'Funcionários'}
               </Heading>
 
               <Button
@@ -155,15 +164,15 @@ export const CustomersList = ({
                   </Th>
                 ) : (
                   <Tbody>
-                    {customers?.map((c) => (
-                      <Tr key={c.pkCustomer}>
-                        <Td>{c.pkCustomer}</Td>
-                        <Td>{c?.name}</Td>
-                        <Td>{c.email ?? '-'}</Td>
-                        <Td>{c.phone ?? '-'}</Td>
+                    {persons?.map((e) => (
+                      <Tr key={e.pkPerson}>
+                        <Td>{e.pkPerson}</Td>
+                        <Td>{e?.name}</Td>
+                        <Td>{e.email ?? '-'}</Td>
+                        <Td>{e.phone ?? '-'}</Td>
                         <Td>
-                          {c.createdAt
-                            ? new Date(c.createdAt).toLocaleDateString('pt-BR')
+                          {e.createdAt
+                            ? new Date(e.createdAt).toLocaleDateString('pt-BR')
                             : '-'}
                         </Td>
                         <Td>
@@ -172,25 +181,25 @@ export const CustomersList = ({
                             variant="ghost"
                             aria-label="visualizar"
                             icon={<FiEye />}
-                            onClick={() => onView(c)}
+                            onClick={() => onView(e)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="editar"
                             icon={<FiEdit />}
-                            onClick={() => onEdit(c)}
+                            onClick={() => onEdit(e)}
                           />
                           <IconButton
                             size="sm"
                             variant="ghost"
                             aria-label="deletar"
                             icon={<FiTrash2 />}
-                            onClick={() => onDelete(c)}
                             isLoading={
                               isDeletting &&
-                              c.pkCustomer === selectedCustomer?.pkCustomer
+                              e.pkPerson === selectedPerson?.pkPerson
                             }
+                            onClick={() => onDelete(e)}
                           />
                         </Td>
                       </Tr>
@@ -201,9 +210,13 @@ export const CustomersList = ({
                 {!isEmpty && (
                   <>
                     <Tfoot></Tfoot>
-                    {customers?.length > 5 && (
+                    {persons?.length > 5 && (
                       <TableCaption mt={4} pb={6}>
-                        Tabela de clientes no sistema
+                        Tabela de
+                        {personType === UserTypeEnum.CUSTOMER
+                          ? ' clientes '
+                          : ' funcionários '}
+                        no sistema
                       </TableCaption>
                     )}
                   </>
@@ -222,27 +235,27 @@ export const CustomersList = ({
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Eliminar cliente
+              Eliminar funcionário
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Deseja eliminar o cliente
-              <b> {selectedCustomer?.name}</b>?
+              Deseja eliminar o funcionário
+              <b> {selectedPerson?.name}</b>?
             </AlertDialogBody>
 
             <AlertDialogFooter>
               <Button
                 mr={3}
                 ref={cancelRef as any}
-                onClick={onClose}
                 disabled={isDeletting}
+                onClick={onClose}
               >
                 Não
               </Button>
               <Button
                 colorScheme="red"
-                onClick={handleConfirmClose}
                 isLoading={isDeletting}
+                onClick={handleConfirmClose}
               >
                 Sim
               </Button>
