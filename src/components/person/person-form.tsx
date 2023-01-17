@@ -115,7 +115,7 @@ export const PersonForm = ({
       name: selectedPerson?.name ?? '',
       email: selectedPerson?.email ?? '',
       bi: selectedPerson?.bi ?? '',
-      birth_date: selectedPerson?.birthDate ?? '',
+      birth_date: selectedPerson?.birthDate?.split?.('T')?.[0] ?? '',
       phone: selectedPerson?.phone ? Number(selectedPerson?.phone) : '',
       password: '',
       address: selectedPerson?.address

@@ -164,8 +164,9 @@ export const ProductsList = ({
                         <Td>{p.pkProduct}</Td>
                         <Td>
                           <Image
-                            w={'80px'}
-                            h={'80px'}
+                            width="100px"
+                            height="70px"
+                            objectFit="contain"
                             src={p.image || '/default-image.png'}
                           />
                         </Td>
@@ -173,7 +174,14 @@ export const ProductsList = ({
                         <Td>{p.productCategory?.name ?? '-'}</Td>
                         <Td>{formatMoney(p.price)}</Td>
                         <Td>{p.stock}</Td>
-                        <Td>
+                        <Td
+                          color={
+                            new Date(p.expirationDate).getTime() <=
+                            new Date().getTime()
+                              ? 'red'
+                              : 'inherit'
+                          }
+                        >
                           {p.expirationDate
                             ? new Date(p.expirationDate).toLocaleDateString(
                                 'pt-PT',

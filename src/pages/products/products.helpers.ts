@@ -9,5 +9,5 @@ export const newProductSchema = Yup.object().shape({
   description: Yup.string().required(REQUIRED_MESSAGE),
   manufacture_date: Yup.string().required(REQUIRED_MESSAGE),
   expiration_date: Yup.string().required(REQUIRED_MESSAGE),
-  fk_product_category: Yup.number().required(REQUIRED_MESSAGE),
+  fk_product_category: Yup.number().nullable().required(REQUIRED_MESSAGE),
 });

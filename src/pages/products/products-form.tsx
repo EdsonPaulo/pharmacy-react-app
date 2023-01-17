@@ -19,13 +19,14 @@ import {
   Text,
   useToast,
 } from '@chakra-ui/react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useMutation, useQuery } from 'react-query';
 import ImageUploading, { ImageListType } from 'react-images-uploading';
 import { BiImageAdd } from 'react-icons/bi';
 import {
   getProductCategories,
   postCreateProduct,
+  putEditProduct,
   postUploadImage,
 } from '../../services/products';
 import { useFormik } from 'formik';
@@ -49,22 +50,59 @@ export const ProductsForm = ({
   const toast = useToast();
   const { data: productCategories = [], isLoading: isLoadingCategories } =
     useQuery('product-categories', getProductCategories);
-
-  const { isLoading, mutate: mutateAddProduct } = useMutation(
+  const { isLoading: isUploading, mutateAsync: mutateUploadImage } =
+    useMutation('upload-product-image', postUploadImage);
+  const { isLoading, mutate: mutateCreateProduct } = useMutation(
     'create-product',
     postCreateProduct,
   );
-  const { isLoading: isUploading, mutateAsync: mutateUploadImage } =
-    useMutation('upload-product-image', postUploadImage);
+  const { isLoading: isEditing, mutate: mutateEditProduct } = useMutation(
+    'edit-product',
+    putEditProduct,
+  );
+
   const [images, setImages] = useState<ImageListType>(
     selectedProduct?.image ? [{ dataURL: selectedProduct?.image }] : [],
   );
 
   const isViewMode = useMemo(() => mode === 'view', [mode]);
 
-  const onChange = (imageList: ImageListType) => {
+  const isEditMode = useMemo(
+    () => mode === 'edit' && !!selectedProduct?.pkProduct,
+    [mode, selectedProduct],
+  );
+
+  const onChangeImage = (imageList: ImageListType) => {
     setImages(imageList);
   };
+
+  const onSuccessExtraCallback = useCallback(
+    (type: 'edit' | 'create') => {
+      toast({
+        duration: 2000,
+        position: 'top-right',
+        variant: 'subtle',
+        status: 'success',
+        title: `Produto ${type === 'edit' ? 'editado' : 'criado'} com sucesso!`,
+      });
+      onRefetch();
+      onClose();
+    },
+    [onClose, onRefetch, toast],
+  );
+
+  const onErrorExtraCallback = useCallback(
+    (message: string) => {
+      toast({
+        duration: 3000,
+        position: 'top-right',
+        variant: 'subtle',
+        status: 'error',
+        title: message,
+      });
+    },
+    [toast],
+  );
 
   const {
     handleSubmit,
@@ -84,63 +122,72 @@ export const ProductsForm = ({
       price: selectedProduct?.price ?? '',
       stock: selectedProduct?.stock ?? '',
       description: selectedProduct?.description ?? '',
-      manufacture_date: selectedProduct?.manufactureDate ?? '',
-      expiration_date: selectedProduct?.expirationDate ?? '',
       fk_product_category: selectedProduct?.fkProductCategory ?? '',
+      expiration_date: selectedProduct?.expirationDate?.split?.('T')?.[0] ?? '',
+      manufacture_date:
+        selectedProduct?.manufactureDate?.split?.('T')?.[0] ?? '',
     },
     onSubmit: async (values) => {
-      let uploadedImageUrl = '';
+      let uploadedImageUrl =
+        images?.[0]?.dataURL === selectedProduct?.image
+          ? selectedProduct?.image
+          : '';
       try {
-        if (images[0]?.file) {
+        if (images[0]?.file && !uploadedImageUrl) {
           await mutateUploadImage(
-            {
-              file: images[0]?.file,
-              dataUrl: images[0]?.dataUrl,
-            },
+            { file: images[0]?.file },
             {
               onSuccess: (res) => {
                 uploadedImageUrl = res.url;
-                console.log('UPLOAD FEITO COM SUCCESSO', res);
               },
-              onError: (e: any) => {
-                console.log('ERROR UPLOADING IMAGE', e, e?.response?.data);
-              },
+              onError: (e: any) => {},
             },
           );
         }
       } catch (error) {}
 
-      mutateAddProduct({ ...values, image: uploadedImageUrl || null } as any, {
-        onSuccess: async () => {
-          resetForm();
-          toast({
-            duration: 2000,
-            position: 'top-right',
-            variant: 'subtle',
-            status: 'success',
-            title: 'Produto criado com sucesso!',
-          });
-          onRefetch();
-          onClose();
-        },
-        onError: (e: any) => {
-          toast({
-            duration: 3000,
-            position: 'top-right',
-            variant: 'subtle',
-            status: 'error',
-            title:
-              e?.response?.data?.message ??
-              'Ocorreu um erro ao criar utilizador',
-          });
-        },
-      });
+      if (isEditMode && !!selectedProduct?.pkProduct) {
+        mutateEditProduct(
+          {
+            product: { ...values, image: uploadedImageUrl || null } as any,
+            productId: selectedProduct?.pkProduct,
+          },
+          {
+            onSuccess: () => {
+              resetForm();
+              onSuccessExtraCallback('edit');
+            },
+            onError: (e: any) => {
+              onErrorExtraCallback(
+                e?.response?.data?.message ??
+                  'Ocorreu um erro ao editar produto',
+              );
+            },
+          },
+        );
+      } else {
+        mutateCreateProduct(
+          { ...values, image: uploadedImageUrl || null } as any,
+          {
+            onSuccess: () => {
+              resetForm();
+              onSuccessExtraCallback('create');
+            },
+            onError: (e: any) => {
+              onErrorExtraCallback(
+                e?.response?.data?.message ??
+                  'Ocorreu um erro ao criar produto',
+              );
+            },
+          },
+        );
+      }
     },
   });
 
   const isAddButtonDisabled = useMemo(
-    () => isLoading || isUploading || !isValid || isViewMode,
-    [isLoading, isUploading, isValid, isViewMode],
+    () => isLoading || isUploading || isEditing || !isValid || isViewMode,
+    [isEditing, isLoading, isUploading, isValid, isViewMode],
   );
 
   return (
@@ -165,7 +212,7 @@ export const ProductsForm = ({
                 <ImageUploading
                   multiple={false}
                   value={images}
-                  onChange={onChange}
+                  onChange={onChangeImage}
                   maxNumber={1}
                 >
                   {({
@@ -177,10 +224,10 @@ export const ProductsForm = ({
                     isDragging,
                     dragProps,
                   }) => (
-                    // write your building UI
-                    <Box className="upload__image-wrapper">
+                    <Center className="upload__image-wrapper">
                       {imageList.length === 0 ? (
                         <Center
+                          maxW={350}
                           onClick={onImageUpload}
                           cursor="pointer"
                           color="gray.600"
@@ -236,7 +283,7 @@ export const ProductsForm = ({
                           ))}
                         </Center>
                       )}
-                    </Box>
+                    </Center>
                   )}
                 </ImageUploading>
               </Box>
@@ -388,7 +435,16 @@ export const ProductsForm = ({
             >
               <FormLabel>Data de expiração</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">
+                <Text
+                  fontWeight="900"
+                  color={
+                    selectedProduct?.expirationDate &&
+                    new Date(selectedProduct?.expirationDate).getTime() <=
+                      new Date().getTime()
+                      ? 'red'
+                      : 'inherit'
+                  }
+                >
                   {selectedProduct?.expirationDate
                     ? new Date(
                         selectedProduct?.expirationDate,
@@ -441,7 +497,7 @@ export const ProductsForm = ({
             <Button
               colorScheme="teal"
               background="brand.primary"
-              isLoading={isLoading || isUploading}
+              isLoading={isLoading || isUploading || isEditing}
               disabled={isAddButtonDisabled}
               type="submit"
             >

@@ -134,7 +134,7 @@ export const OrdersForm = ({
             onError: (e: any) => {
               onErrorExtraCallback(
                 e?.response?.data?.message ??
-                  'Ocorreu um erro ao editar funcionário',
+                  'Ocorreu um erro ao editar encomenda',
               );
             },
           },
@@ -148,7 +148,7 @@ export const OrdersForm = ({
           onError: (e: any) => {
             onErrorExtraCallback(
               e?.response?.data?.message ??
-                'Ocorreu um erro ao criar funcionário',
+                'Ocorreu um erro ao criar encomenda',
             );
           },
         });
