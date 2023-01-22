@@ -27,7 +27,7 @@ import { personSchema } from './person.helpers';
 import { IPerson } from '../../typescript/types';
 import AngolaCities from '../../constants/angolan-cities.json';
 import { UserTypeEnum } from '../../typescript/enums';
-import { UserTypesMap } from '../../pages/users/users.helpers';
+import { UserTypesMap } from '../users/users.helpers';
 interface PersonFormProps {
   mode: 'edit' | 'view';
   selectedPerson?: IPerson;
@@ -101,7 +101,6 @@ export const PersonForm = ({
     handleSubmit,
     isValid,
     errors,
-    status,
     touched,
     handleChange,
     resetForm,
@@ -109,15 +108,16 @@ export const PersonForm = ({
   } = useFormik({
     validationSchema: personSchema,
     enableReinitialize: true,
-    validateOnMount: true,
+    validateOnMount: false,
     validateOnChange: true,
     initialValues: {
       name: selectedPerson?.name ?? '',
       email: selectedPerson?.email ?? '',
       bi: selectedPerson?.bi ?? '',
       birth_date: selectedPerson?.birthDate?.split?.('T')?.[0] ?? '',
-      phone: selectedPerson?.phone ? Number(selectedPerson?.phone) : '',
+      phone: selectedPerson?.phone ?? '',
       password: '',
+      user_type: selectedPerson?.user?.userType ?? personType,
       address: selectedPerson?.address
         ? {
             name: selectedPerson?.address?.name ?? '',
@@ -168,15 +168,13 @@ export const PersonForm = ({
     },
   });
 
-  console.log(errors, touched, status);
-
   const isAddButtonDisabled = useMemo(
     () => isLoading || isEditting || !isValid || isViewMode,
     [isEditting, isLoading, isValid, isViewMode],
   );
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} autoComplete="off">
       <ModalContent>
         <ModalHeader>
           {isViewMode
@@ -209,7 +207,9 @@ export const PersonForm = ({
                   id="name"
                   name="name"
                   value={values.name}
-                  placeholder={'ex.: John Doe'}
+                  type="text"
+                  autoComplete="none"
+                  placeholder={'Nome e Sobrenome'}
                   onChange={handleChange}
                 />
               )}
@@ -230,7 +230,9 @@ export const PersonForm = ({
                   type="email"
                   value={values.email}
                   disabled={isEditMode}
-                  placeholder={'funcionário@email.com'}
+                  role="presentation"
+                  autoComplete="off"
+                  placeholder={'pessoa@email.com'}
                   onChange={handleChange}
                 />
               )}
@@ -311,9 +313,45 @@ export const PersonForm = ({
                   type="password"
                   value={values.password}
                   placeholder={'********'}
+                  autoComplete="new-password"
                   onChange={handleChange}
                 />
                 <FormErrorMessage>{errors.password}</FormErrorMessage>
+              </FormControl>
+            )}
+
+            {personType !== UserTypeEnum.CUSTOMER && (
+              <FormControl
+                isRequired={!isViewMode}
+                isInvalid={
+                  !isViewMode && !!errors?.user_type && !!touched?.user_type
+                }
+              >
+                <FormLabel>Tipo</FormLabel>
+                {isViewMode ? (
+                  <Text fontWeight="900">
+                    {selectedPerson?.user?.userType
+                      ? UserTypesMap[selectedPerson?.user?.userType]
+                      : '-'}
+                  </Text>
+                ) : (
+                  <Select
+                    id="user_type"
+                    name="user_type"
+                    value={values?.user_type}
+                    placeholder={'Selecione o tipo de conta'}
+                    onChange={handleChange}
+                  >
+                    {Object.values(UserTypeEnum)
+                      .filter((t) => t !== UserTypeEnum.CUSTOMER)
+                      .map((type) => (
+                        <option key={type} value={type}>
+                          {UserTypesMap[type]}
+                        </option>
+                      ))}
+                  </Select>
+                )}
+                <FormErrorMessage>{errors?.user_type}</FormErrorMessage>
               </FormControl>
             )}
 

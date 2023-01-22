@@ -55,7 +55,7 @@ export const ProductCategoriesPage = () => {
   );
 
   return (
-    <Box flex={1} p={10}>
+    <Box flex={1} px={10}>
       <ProductCategoriesList
         isEmpty={isEmpty}
         isLoading={isLoading}

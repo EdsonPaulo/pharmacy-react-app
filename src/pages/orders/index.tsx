@@ -29,8 +29,8 @@ export const OrdersPage = () => {
 
   const handleEditOrder = useCallback(
     (order: IOrder) => {
-      setFormMode('edit');
       setSelectedOrder(order);
+      setFormMode('edit');
       openForm();
     },
     [openForm],
@@ -66,7 +66,7 @@ export const OrdersPage = () => {
         isOpen={isFormOpen}
         onClose={handleCloseModal}
         closeOnOverlayClick={false}
-        size={{ base: 'sm', md: 'lg', lg: '4xl' }}
+        size={{ base: 'sm', md: 'lg', lg: '2xl' }}
       >
         <ModalOverlay />
 

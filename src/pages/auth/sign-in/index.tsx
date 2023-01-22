@@ -52,6 +52,8 @@ export const SignInPage = () => {
             value={formData.email}
             placeholder="utilizador@email.com"
             inputMode="email"
+            role="presentation"
+            autoComplete="off"
             onChange={({ target: { value } }) =>
               handleChangeFormData({ email: value })
             }
@@ -66,6 +68,7 @@ export const SignInPage = () => {
                 value={formData.password}
                 type={showPassword ? 'text' : 'password'}
                 placeholder="********"
+                autoComplete="new-password"
                 onChange={({ target: { value } }) =>
                   handleChangeFormData({ password: value })
                 }

@@ -149,7 +149,11 @@ export const PersonList = ({
                     <Th>Nome</Th>
                     <Th>Email</Th>
                     <Th>Telefone</Th>
-                    <Th>Criado em</Th>
+                    <Th>
+                      {personType === UserTypeEnum.CUSTOMER
+                        ? 'Criado em'
+                        : 'Admin?'}
+                    </Th>
                     <Th>Ações</Th>
                   </Tr>
                 </Thead>
@@ -171,9 +175,15 @@ export const PersonList = ({
                         <Td>{e.email ?? '-'}</Td>
                         <Td>{e.phone ?? '-'}</Td>
                         <Td>
-                          {e.createdAt
-                            ? new Date(e.createdAt).toLocaleDateString('pt-BR')
-                            : '-'}
+                          {personType === UserTypeEnum.CUSTOMER
+                            ? e.createdAt
+                              ? new Date(e.createdAt).toLocaleDateString(
+                                  'pt-BR',
+                                )
+                              : '-'
+                            : e.user?.userType === UserTypeEnum.ADMIN
+                            ? 'Sim'
+                            : 'Não'}
                         </Td>
                         <Td>
                           <IconButton

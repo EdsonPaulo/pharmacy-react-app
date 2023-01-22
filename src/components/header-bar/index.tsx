@@ -54,6 +54,7 @@ export const HeaderBar = () => {
       alignItems="center"
       background="white"
       justifyContent="flex-end"
+      borderBottomWidth={1}
     >
       <Avatar size="sm" />
 

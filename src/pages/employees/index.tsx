@@ -1,4 +1,4 @@
-import { PersonPage } from '../../components/person';
+import { PersonPage } from '../person';
 import { UserTypeEnum } from '../../typescript/enums';
 
 export const EmployeesPage = () => {

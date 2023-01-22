@@ -12,9 +12,12 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { useFormik } from 'formik';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useMutation } from 'react-query';
-import { postCreateProductCategory } from '../../../services/products';
+import {
+  postCreateProductCategory,
+  putEditProductCategory,
+} from '../../../services/products';
 import { IProductCategory } from '../../../typescript/types';
 import { newProductCategorySchema } from './product-categories.helpers';
 
@@ -36,8 +39,45 @@ export const ProductCategoryForm = ({
     'create-product-category',
     postCreateProductCategory,
   );
+  const { isLoading: isEditting, mutate: mutateEditProductCategory } =
+    useMutation('edit-product-category', putEditProductCategory);
 
   const isViewMode = useMemo(() => mode === 'view', [mode]);
+
+  const isEditMode = useMemo(
+    () => mode === 'edit' && !!selectedProductCategory?.pkProductCategory,
+    [mode, selectedProductCategory],
+  );
+
+  const onSuccessExtraCallback = useCallback(
+    (type: 'edit' | 'create') => {
+      toast({
+        duration: 2000,
+        position: 'top-right',
+        variant: 'subtle',
+        status: 'success',
+        title: `Categoria ${
+          type === 'edit' ? 'editada' : 'criada'
+        } com sucesso!`,
+      });
+      onRefetch();
+      onClose();
+    },
+    [onClose, onRefetch, toast],
+  );
+
+  const onErrorExtraCallback = useCallback(
+    (message: string) => {
+      toast({
+        duration: 3000,
+        position: 'top-right',
+        variant: 'subtle',
+        status: 'error',
+        title: message,
+      });
+    },
+    [toast],
+  );
 
   const {
     handleSubmit,
@@ -50,43 +90,51 @@ export const ProductCategoryForm = ({
   } = useFormik({
     validationSchema: newProductCategorySchema,
     enableReinitialize: true,
-    validateOnMount: true,
+    validateOnMount: false,
     validateOnChange: true,
     initialValues: {
       name: selectedProductCategory?.name ?? '',
     },
     onSubmit: (values) => {
-      mutateAddProductCategory(values, {
-        onSuccess: async () => {
-          resetForm();
-          toast({
-            duration: 2000,
-            position: 'top-right',
-            variant: 'subtle',
-            status: 'success',
-            title: 'Categoria criada com sucesso!',
-          });
-          onRefetch();
-          onClose();
-        },
-        onError: (e: any) => {
-          toast({
-            duration: 3000,
-            position: 'top-right',
-            variant: 'subtle',
-            status: 'error',
-            title:
+      if (isEditMode && !!selectedProductCategory) {
+        mutateEditProductCategory(
+          {
+            name: values.name,
+            productCategoryId: selectedProductCategory?.pkProductCategory,
+          },
+          {
+            onSuccess: () => {
+              resetForm();
+              onSuccessExtraCallback('edit');
+            },
+            onError: (e: any) => {
+              onErrorExtraCallback(
+                e?.response?.data?.message ??
+                  'Ocorreu um erro ao editar categoria',
+              );
+            },
+          },
+        );
+      } else {
+        mutateAddProductCategory(values, {
+          onSuccess: () => {
+            resetForm();
+            onSuccessExtraCallback('create');
+          },
+          onError: (e: any) => {
+            onErrorExtraCallback(
               e?.response?.data?.message ??
-              'Ocorreu um erro ao criar categoria',
-          });
-        },
-      });
+                'Ocorreu um erro ao criar categoria',
+            );
+          },
+        });
+      }
     },
   });
 
   const isAddButtonDisabled = useMemo(
-    () => isLoading || !isValid || isViewMode,
-    [isLoading, isValid, isViewMode],
+    () => isLoading || isEditting || !isValid || isViewMode,
+    [isEditting, isLoading, isValid, isViewMode],
   );
 
   return (
@@ -121,7 +169,7 @@ export const ProductCategoryForm = ({
           <Button
             colorScheme="teal"
             background="brand.primary"
-            isLoading={isLoading}
+            isLoading={isLoading || isEditting}
             disabled={isAddButtonDisabled}
             type="submit"
           >

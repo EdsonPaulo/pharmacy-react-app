@@ -4,7 +4,7 @@ import { IPerson } from '../typescript/types';
 import { APIConnector } from './APIConnector';
 
 export const getPersons = async (
-  userType: UserTypeEnum,
+  userType?: UserTypeEnum,
 ): Promise<IPerson[]> => {
   const response = await APIConnector.get('/person', {
     params: {

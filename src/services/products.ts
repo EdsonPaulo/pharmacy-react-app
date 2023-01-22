@@ -71,7 +71,7 @@ export const postCreateProductCategory: TPostCreateProductCategory = async (
   return toCamelCase(response.data?.data) as IProductCategory;
 };
 
-export const postEditProductCategory: TPutEditProductCategory = async ({
+export const putEditProductCategory: TPutEditProductCategory = async ({
   name,
   productCategoryId,
 }) => {

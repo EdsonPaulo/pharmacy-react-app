@@ -115,7 +115,7 @@ export const ProductsForm = ({
   } = useFormik({
     validationSchema: newProductSchema,
     enableReinitialize: true,
-    validateOnMount: true,
+    validateOnMount: false,
     validateOnChange: true,
     initialValues: {
       name: selectedProduct?.name ?? '',

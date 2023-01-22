@@ -54,6 +54,8 @@ export const SignUpPage = () => {
             value={formData.name}
             placeholder="Utilizador Exemplo"
             inputMode="text"
+            type="text"
+            autoComplete="none"
             onChange={({ target: { value } }) =>
               handleChangeFormData({ name: value })
             }
@@ -68,6 +70,8 @@ export const SignUpPage = () => {
             value={formData.email}
             placeholder="utilizador@email.com"
             inputMode="email"
+            role="presentation"
+            autoComplete="off"
             onChange={({ target: { value } }) =>
               handleChangeFormData({ email: value })
             }
@@ -83,6 +87,7 @@ export const SignUpPage = () => {
               value={formData.password}
               type={showPassword ? 'text' : 'password'}
               placeholder="********"
+              autoComplete="new-password"
               onChange={({ target: { value } }) =>
                 handleChangeFormData({ password: value })
               }

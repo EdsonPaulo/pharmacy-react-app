@@ -7,37 +7,84 @@ import {
   Button,
   Grid,
   GridItem,
+  SimpleGrid,
+  Modal,
+  ModalOverlay,
+  useDisclosure,
+  Spinner,
+  Flex,
 } from '@chakra-ui/react';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { FiPlus } from 'react-icons/fi';
+import { HiOutlineArrowRight } from 'react-icons/hi';
+import { useQuery } from 'react-query';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../constants/routes';
+import { formatMoney } from '../../helpers/numberFormat';
+import { getOrders } from '../../services/orders';
+import { getStatistics } from '../../services/statistics';
+import { OrderItem } from '../orders/order-item';
+import { OrdersForm } from '../orders/orders-form';
 import { OrdersPie } from './orders-pie';
 
 const DashboardWidget = ({
   label,
   value,
+  isLoading,
 }: {
+  isLoading?: boolean;
   label: string;
   value: string;
 }) => (
   <Box px={6} flex={1} key={label}>
-    <Box>
-      <Text fontSize="sm" color="brand.accent">
-        {label}
-      </Text>
-      <Box mb={2} h="3px" w="25px" bgColor="#E96A10" />
-      <Text color="#3C557A" fontWeight="bold" fontSize={{ md: 'lg', lg: 'xl' }}>
-        {value}
-      </Text>
-    </Box>
+    <Flex justifyContent="space-between">
+      <Box>
+        <Text fontSize="sm" color="brand.accent">
+          {label}
+        </Text>
+        <Box mb={2} h="3px" w="25px" bgColor="#E96A10" />
+      </Box>
+
+      {isLoading && <Spinner size="xs" color="brand.accent" />}
+    </Flex>
+
+    <Text color="#3C557A" fontWeight="bold" fontSize={{ md: 'lg', lg: 'xl' }}>
+      {value}
+    </Text>
   </Box>
 );
 
 export const DashboardPage = () => {
-  const handleNewOrder = useCallback(() => {}, []);
+  const navigate = useNavigate();
+  const { isOpen: isFormOpen, onOpen: openForm, onClose } = useDisclosure();
+  const {
+    data: ordersData,
+    isLoading: isLoadingOrders,
+    refetch,
+  } = useQuery('orders', getOrders);
+  const { data: statsData, isLoading: isLoadingStats } = useQuery(
+    'dashboard-stats',
+    getStatistics,
+  );
+
+  const orders = useMemo(() => ordersData?.slice?.(0, 5) ?? [], [ordersData]);
+
+  const isEmpty = useMemo(
+    () => !isLoadingOrders && (!ordersData || ordersData?.length === 0),
+    [isLoadingOrders, ordersData],
+  );
+
+  const handleCloseModal = useCallback(() => {
+    onClose();
+  }, [onClose]);
+
+  const handleRefetch = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   return (
-    <Box flex={1} p={10}>
-      <Heading as="h1" fontSize={18}>
+    <Box flex={1} p={10} mt={6}>
+      <Heading as="h1" fontSize={22} color="brand.primaryDark">
         Dashboard
       </Heading>
 
@@ -55,15 +102,27 @@ export const DashboardPage = () => {
           borderWidth="1px"
           borderColor="rgba(0, 0, 0, 0.14)"
         >
-          <DashboardWidget label="Valor em vendas" value={'AOA 1000005'} />
+          <DashboardWidget
+            isLoading={isLoadingStats}
+            label="Valor em vendas"
+            value={formatMoney(statsData?.totalOrdersValue ?? 0)}
+          />
 
           <Divider orientation="vertical" mx={1} />
 
-          <DashboardWidget label="Produtos Cadastrados" value={'00005033'} />
+          <DashboardWidget
+            isLoading={isLoadingStats}
+            label="Produtos Cadastrados"
+            value={`00000${statsData?.countProducts ?? 0}`}
+          />
 
           <Divider orientation="vertical" mx={1} />
 
-          <DashboardWidget label="Total de Encomendas" value={'00000055'} />
+          <DashboardWidget
+            isLoading={isLoadingStats}
+            label="Total de Encomendas"
+            value={`00000${statsData?.countOrders ?? 0}`}
+          />
         </GridItem>
 
         <GridItem>
@@ -75,7 +134,7 @@ export const DashboardPage = () => {
             alignItems="center"
             colorScheme="teal"
             bg="brand.primary"
-            onClick={handleNewOrder}
+            onClick={openForm}
           >
             Realizar venda
             <Center mt={1}>
@@ -85,13 +144,41 @@ export const DashboardPage = () => {
         </GridItem>
 
         <GridItem>
-          <Heading fontSize={16} color="brand.primary">
-            Últimos Pedidos
-          </Heading>
+          <Flex mb={2} alignItems="center" justifyContent="space-between">
+            <Heading fontSize={16} color="brand.primaryDark">
+              Últimos Pedidos
+            </Heading>
+
+            <Button
+              variant="ghost"
+              colorScheme="green"
+              fontSize="xs"
+              rightIcon={<HiOutlineArrowRight />}
+              onClick={() => {
+                navigate(ROUTES.Orders);
+              }}
+            >
+              Ver tudo
+            </Button>
+          </Flex>
+
+          {isEmpty ? (
+            <Center minH={350}>
+              <Text color="blackAlpha.500" textAlign="center">
+                Sem dados para mostrar!
+              </Text>
+            </Center>
+          ) : (
+            <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="15px">
+              {orders?.map((o) => (
+                <OrderItem hideActions order={o} key={o.pkOrder} />
+              ))}
+            </SimpleGrid>
+          )}
         </GridItem>
 
         <GridItem>
-          <Text fontSize="sm" color="brand.primary" fontWeight="bold">
+          <Text fontSize="sm" color="brand.primaryDark" fontWeight="bold">
             Encomendas
           </Text>
 
@@ -128,6 +215,20 @@ export const DashboardPage = () => {
           </Box>
         </GridItem>
       </Grid>
+
+      <Modal
+        isOpen={isFormOpen}
+        onClose={handleCloseModal}
+        closeOnOverlayClick={false}
+        size={{ base: 'sm', md: 'lg', lg: '2xl' }}
+      >
+        <ModalOverlay />
+        <OrdersForm
+          mode="edit"
+          onClose={handleCloseModal}
+          onRefetch={handleRefetch}
+        />
+      </Modal>
     </Box>
   );
 };

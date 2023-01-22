@@ -12,3 +12,23 @@ export const toCamelCase = (obj = {} as any) =>
       acc[camelKey] = isObject(value) ? toCamelCase(value) : value;
     },
   );
+
+export const groupElementsBy = (
+  elements: Array<Record<string, any>>,
+  key: string,
+) => {
+  return elements.reduce((rv: any, x: any) => {
+    (rv[x[key]] = rv[x[key]] || []).push(x);
+    return rv;
+  }, {});
+};
+
+export const groupedSelectOptions = (
+  elements: Array<Record<string, any>>,
+  key: string,
+) => {
+  return Object.entries(groupElementsBy(elements, key)).map((i) => ({
+    label: i[0],
+    options: i[1],
+  }));
+};

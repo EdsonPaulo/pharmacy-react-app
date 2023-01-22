@@ -8,17 +8,12 @@ export const getOrders = async (): Promise<IOrder[]> => {
 };
 
 interface OrderPayload {
-  name: string;
-  email: string;
-  bi?: string;
-  birth_date?: string;
-  phone?: string;
-  password: string;
-  address: null | {
-    name: string;
-    city: string;
-    residence: string;
-  };
+  order_date: string | null;
+  fk_customer: number | null;
+  fk_address: number | null;
+  fk_employee: number | null;
+  observation: string;
+  products: Array<{ id: number; quantity: number }>;
 }
 
 type TPostCreateOrder = (payload: OrderPayload) => Promise<IOrder>;

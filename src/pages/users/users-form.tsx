@@ -13,9 +13,9 @@ import {
   SimpleGrid,
   useToast,
 } from '@chakra-ui/react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useMutation } from 'react-query';
-import { postCreateUser } from '../../services/users';
+import { postCreateUser, putEditUser } from '../../services/users';
 import { useFormik } from 'formik';
 import { newUserSchema, UserTypesMap } from './users.helpers';
 import { UserTypeEnum } from '../../typescript/enums';
@@ -39,8 +39,47 @@ export const UsersForm = ({
     'create-user',
     postCreateUser,
   );
+  const { isLoading: isEditting, mutate: mutateEditUser } = useMutation(
+    'edit-user',
+    putEditUser,
+  );
 
   const isViewMode = useMemo(() => mode === 'view', [mode]);
+
+  const isEditMode = useMemo(
+    () => mode === 'edit' && !!selectedUser?.pkUser,
+    [mode, selectedUser],
+  );
+
+  const onSuccessExtraCallback = useCallback(
+    (type: 'edit' | 'create') => {
+      toast({
+        duration: 2000,
+        position: 'top-right',
+        variant: 'subtle',
+        status: 'success',
+        title: `Utilizador ${
+          type === 'edit' ? 'editado' : 'criado'
+        } com sucesso!`,
+      });
+      onRefetch();
+      onClose();
+    },
+    [onClose, onRefetch, toast],
+  );
+
+  const onErrorExtraCallback = useCallback(
+    (message: string) => {
+      toast({
+        duration: 3000,
+        position: 'top-right',
+        variant: 'subtle',
+        status: 'error',
+        title: message,
+      });
+    },
+    [toast],
+  );
 
   const {
     handleSubmit,
@@ -53,7 +92,7 @@ export const UsersForm = ({
   } = useFormik({
     validationSchema: newUserSchema,
     enableReinitialize: true,
-    validateOnMount: true,
+    validateOnMount: false,
     validateOnChange: true,
     initialValues: {
       name: selectedUser?.personalInfo?.name ?? '',
@@ -62,41 +101,49 @@ export const UsersForm = ({
       user_type: selectedUser?.userType ?? null,
     },
     onSubmit: (values) => {
-      mutateAddUser(values, {
-        onSuccess: async () => {
-          resetForm();
-          toast({
-            duration: 2000,
-            position: 'top-right',
-            variant: 'subtle',
-            status: 'success',
-            title: 'Utilizador criado com sucesso!',
-          });
-          onRefetch();
-          onClose();
-        },
-        onError: (e: any) => {
-          toast({
-            duration: 3000,
-            position: 'top-right',
-            variant: 'subtle',
-            status: 'error',
-            title:
+      if (isEditMode && !!selectedUser) {
+        mutateEditUser(
+          {
+            user: values as any,
+            userId: selectedUser?.pkUser,
+          },
+          {
+            onSuccess: () => {
+              resetForm();
+              onSuccessExtraCallback('edit');
+            },
+            onError: (e: any) => {
+              onErrorExtraCallback(
+                e?.response?.data?.message ??
+                  'Ocorreu um erro ao editar utitlizador',
+              );
+            },
+          },
+        );
+      } else {
+        mutateAddUser(values, {
+          onSuccess: async () => {
+            resetForm();
+            onSuccessExtraCallback('create');
+          },
+          onError: (e: any) => {
+            onErrorExtraCallback(
               e?.response?.data?.message ??
-              'Ocorreu um erro ao criar utilizador',
-          });
-        },
-      });
+                'Ocorreu um erro ao criar utilizador',
+            );
+          },
+        });
+      }
     },
   });
 
   const isAddButtonDisabled = useMemo(
-    () => isLoading || !isValid || isViewMode,
-    [isLoading, isValid, isViewMode],
+    () => isLoading || isEditting || !isValid || isViewMode,
+    [isEditting, isLoading, isValid, isViewMode],
   );
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} autoComplete="off">
       <ModalContent>
         <ModalHeader>{selectedUser ? 'Editar' : 'Novo'} Utilizador</ModalHeader>
         <ModalCloseButton />
@@ -111,10 +158,11 @@ export const UsersForm = ({
               <Input
                 id="name"
                 name="name"
-                type="text"
                 value={values.name}
                 disabled={isViewMode}
                 placeholder="ex.: John Doe"
+                type="text"
+                autoComplete="none"
                 onChange={handleChange}
               />
               <FormErrorMessage>{errors.name}</FormErrorMessage>
@@ -131,6 +179,8 @@ export const UsersForm = ({
                 type="email"
                 value={values.email}
                 disabled={isViewMode}
+                role="presentation"
+                autoComplete="off"
                 placeholder="utilizador@email.com"
                 onChange={handleChange}
               />
@@ -146,6 +196,7 @@ export const UsersForm = ({
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="new-password"
                 value={values.password}
                 disabled={isViewMode}
                 placeholder="********"
@@ -180,13 +231,13 @@ export const UsersForm = ({
 
         <ModalFooter>
           <Button mr={4} variant="ghost" onClick={onClose}>
-            Cancelar
+            Fechar
           </Button>
 
           <Button
             colorScheme="teal"
             background="brand.primary"
-            isLoading={isLoading}
+            isLoading={isLoading || isEditting}
             disabled={isAddButtonDisabled}
             type="submit"
           >

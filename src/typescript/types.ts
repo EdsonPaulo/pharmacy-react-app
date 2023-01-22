@@ -1,5 +1,11 @@
 import { UserTypeEnum } from './enums';
 
+export interface IStatistics {
+  countOrders: number;
+  countProducts: number;
+  totalOrdersValue: number;
+}
+
 export interface IAddress {
   pkAddress: number;
   name: string;
@@ -55,13 +61,26 @@ export interface IProduct {
   productCategory: IProductCategory;
 }
 
+export interface IProductOrder {
+  fkOrder: number;
+  fkProduct: number;
+  pkProductOrder: number;
+  quantity: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface IOrder {
   pkOrder: number;
   total: number;
   address: IAddress;
   customer: IPerson;
   employee: IPerson;
-  products: IProduct[];
+  products: Array<
+    IProduct & {
+      productOrder: IProductOrder;
+    }
+  >;
   orderDate: string;
   observation: string;
   createdAt: string;
