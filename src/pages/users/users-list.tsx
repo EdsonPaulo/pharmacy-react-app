@@ -107,7 +107,7 @@ export const UsersList = ({
         borderColor="blackAlpha.100"
       >
         {isLoading ? (
-          <Center minH={400}>
+          <Center minH={400} flex={1}>
             <Spinner
               size="xl"
               emptyColor="gray.200"

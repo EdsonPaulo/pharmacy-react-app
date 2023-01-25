@@ -11,6 +11,7 @@ import { useMutation } from 'react-query';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES, AUTH_ROUTES } from '../constants/routes';
 import { getMeUser, postSignIn, postSignUp } from '../services/auth';
+import { UserTypeEnum } from '../typescript/enums';
 import { IUser } from '../typescript/types';
 
 interface TFormData {
@@ -27,6 +28,7 @@ interface TAuthContextData {
   handleSignIn: () => void;
   handleSignUp: () => void;
   handleLogout: () => void;
+  handleGetUserData: () => void;
   handleChangeFormData: (args: Partial<TFormData>) => void;
 }
 
@@ -83,7 +85,11 @@ export const AuthProvider = (props: any) => {
           status: 'success',
           title: 'Login efectuado com sucesso!',
         });
-        navigate(ROUTES.Dashboard);
+        navigate(
+          u?.userType !== UserTypeEnum.CUSTOMER
+            ? ROUTES.Dashboard
+            : ROUTES.StoreFront,
+        );
         localStorage.setItem('access_token', u.accessToken);
       },
       onError: (e: any) => {
@@ -110,7 +116,11 @@ export const AuthProvider = (props: any) => {
           status: 'success',
           title: 'Conta criada com sucesso!',
         });
-        navigate(ROUTES.Dashboard);
+        navigate(
+          u?.userType !== UserTypeEnum.CUSTOMER
+            ? ROUTES.Dashboard
+            : ROUTES.StoreFront,
+        );
         localStorage.setItem('access_token', u.accessToken);
       },
       onError: (e: any) => {
@@ -130,16 +140,7 @@ export const AuthProvider = (props: any) => {
     setFormData((prev) => ({ ...prev, ...args }));
   }, []);
 
-  useEffect(() => {
-    if (!isLoggedIn && !Object.values(AUTH_ROUTES).includes(pathname)) {
-      navigate(AUTH_ROUTES.AuthSignIn);
-    }
-    if (isLoggedIn && Object.values(AUTH_ROUTES).includes(pathname)) {
-      navigate(ROUTES.Dashboard);
-    }
-  }, [navigate, pathname, isLoggedIn]);
-
-  useEffect(() => {
+  const handleGetUserData = useCallback(() => {
     mutateGetMeUser(undefined, {
       onSuccess: (u) => {
         setUser(u);
@@ -149,6 +150,23 @@ export const AuthProvider = (props: any) => {
         handleLogout();
       },
     });
+  }, [handleLogout, mutateGetMeUser]);
+
+  useEffect(() => {
+    if (!isLoggedIn && !Object.values(AUTH_ROUTES).includes(pathname)) {
+      navigate(AUTH_ROUTES.AuthSignIn);
+    }
+    if (isLoggedIn && Object.values(AUTH_ROUTES).includes(pathname)) {
+      navigate(
+        user?.userType !== UserTypeEnum.CUSTOMER
+          ? ROUTES.Dashboard
+          : ROUTES.StoreFront,
+      );
+    }
+  }, [navigate, pathname, isLoggedIn, user?.userType]);
+
+  useEffect(() => {
+    handleGetUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -162,6 +180,7 @@ export const AuthProvider = (props: any) => {
       handleSignUp,
       handleLogout,
       handleChangeFormData,
+      handleGetUserData,
     }),
     [
       user,
@@ -174,6 +193,7 @@ export const AuthProvider = (props: any) => {
       handleSignUp,
       handleLogout,
       handleChangeFormData,
+      handleGetUserData,
     ],
   );
 

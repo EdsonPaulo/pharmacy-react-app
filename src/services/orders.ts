@@ -7,11 +7,16 @@ export const getOrders = async (): Promise<IOrder[]> => {
   return toCamelCase(response?.data?.data) as IOrder[];
 };
 
+export const getMyOrders = async (userId: number): Promise<IOrder[]> => {
+  const response = await APIConnector.get(`/order/me/${userId}`);
+  return toCamelCase(response?.data?.data) as IOrder[];
+};
+
 interface OrderPayload {
   order_date: string | null;
-  fk_customer: number | null;
+  fk_customer?: number | null;
   fk_address: number | null;
-  fk_employee: number | null;
+  fk_employee?: number | null;
   observation: string;
   products: Array<{ id: number; quantity: number }>;
 }
@@ -35,5 +40,10 @@ export const putEditOrder: TPutEditOrder = async ({ order, orderId }) => {
 
 export const deleteOrder = async (orderId: number) => {
   const response = await APIConnector.delete(`/order/${orderId}`);
+  return toCamelCase(response.data?.data) as IOrder;
+};
+
+export const cancelOrder = async (orderId: number) => {
+  const response = await APIConnector.post(`/order/cancel/${orderId}`);
   return toCamelCase(response.data?.data) as IOrder;
 };

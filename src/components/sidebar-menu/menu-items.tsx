@@ -8,6 +8,29 @@ import { RiUserSettingsLine } from 'react-icons/ri';
 
 import { ROUTES } from '../../constants/routes';
 
+export const CustomerMenu = [
+  {
+    title: 'Menu Principal',
+    children: [
+      {
+        title: 'Loja',
+        path: ROUTES.StoreFront,
+        icon: FiGrid,
+      },
+      {
+        title: 'Minhas Compras',
+        path: ROUTES.CustomerOrders,
+        icon: BiReceipt,
+      },
+      {
+        title: 'Configurações',
+        path: ROUTES.Profile,
+        icon: RiUserSettingsLine,
+      },
+    ],
+  },
+];
+
 export const AdminMenu = [
   {
     title: 'Menu Principal',

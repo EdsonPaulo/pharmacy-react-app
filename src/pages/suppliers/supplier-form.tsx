@@ -8,7 +8,6 @@ import {
   Button,
   FormControl,
   FormErrorMessage,
-  FormHelperText,
   FormLabel,
   Input,
   SimpleGrid,
@@ -21,44 +20,40 @@ import {
 import { useCallback, useMemo } from 'react';
 import { useMutation } from 'react-query';
 
-import { postCreatePerson, putEditPerson } from '../../services/person';
+import { postCreateSupplier, putEditSupplier } from '../../services/supplier';
 import { useFormik } from 'formik';
-import { personSchema } from './person.helpers';
-import { IPerson } from '../../typescript/types';
+import { supplierSchema } from './supplier.helpers';
+import { ISupplier } from '../../typescript/types';
 import AngolaCities from '../../constants/angolan-cities.json';
-import { UserTypeEnum } from '../../typescript/enums';
-import { UserTypesMap } from '../users/users.helpers';
 
-interface PersonFormProps {
+interface SupplierFormProps {
   mode: 'edit' | 'view';
-  selectedPerson?: IPerson;
+  selectedSupplier?: ISupplier;
   onClose: () => void;
   onRefetch: () => void;
-  personType: UserTypeEnum;
 }
 
-export const PersonForm = ({
-  selectedPerson,
+export const SupplierForm = ({
+  selectedSupplier,
   mode,
   onClose,
   onRefetch,
-  personType,
-}: PersonFormProps) => {
+}: SupplierFormProps) => {
   const toast = useToast();
-  const { isLoading, mutate: mutateAddPerson } = useMutation(
-    `create-person-${personType}`,
-    postCreatePerson,
+  const { isLoading, mutate: mutateAddSupplier } = useMutation(
+    'create-supplier',
+    postCreateSupplier,
   );
-  const { isLoading: isEditting, mutate: mutateEditPerson } = useMutation(
-    `edit-person-${personType}`,
-    putEditPerson,
+  const { isLoading: isEditting, mutate: mutateEditSupplier } = useMutation(
+    'edit-supplier',
+    putEditSupplier,
   );
 
   const isViewMode = useMemo(() => mode === 'view', [mode]);
 
   const isEditMode = useMemo(
-    () => mode === 'edit' && !!selectedPerson?.pkPerson,
-    [mode, selectedPerson],
+    () => mode === 'edit' && !!selectedSupplier?.pkSupplier,
+    [mode, selectedSupplier],
   );
 
   const luandaCities = useMemo(
@@ -75,7 +70,7 @@ export const PersonForm = ({
         position: 'top-right',
         variant: 'subtle',
         status: 'success',
-        title: `Funcionário ${
+        title: `Fornecedor ${
           type === 'edit' ? 'editado' : 'criado'
         } com sucesso!`,
       });
@@ -107,23 +102,20 @@ export const PersonForm = ({
     resetForm,
     values,
   } = useFormik({
-    validationSchema: personSchema,
+    validationSchema: supplierSchema,
     enableReinitialize: true,
     validateOnMount: false,
     validateOnChange: true,
     initialValues: {
-      name: selectedPerson?.name ?? '',
-      email: selectedPerson?.email ?? '',
-      bi: selectedPerson?.bi ?? '',
-      birth_date: selectedPerson?.birthDate?.split?.('T')?.[0] ?? '',
-      phone: selectedPerson?.phone ?? '',
-      password: '',
-      user_type: selectedPerson?.user?.userType ?? personType,
-      address: selectedPerson?.address
+      name: selectedSupplier?.name ?? '',
+      email: selectedSupplier?.email ?? '',
+      nif: selectedSupplier?.nif ?? '',
+      phone: selectedSupplier?.phone ?? '',
+      address: selectedSupplier?.address
         ? {
-            name: selectedPerson?.address?.name ?? '',
-            city: selectedPerson?.address?.city ?? '',
-            residence: selectedPerson?.address?.residence ?? '',
+            name: selectedSupplier?.address?.name ?? '',
+            city: selectedSupplier?.address?.city ?? '',
+            residence: selectedSupplier?.address?.residence ?? '',
           }
         : {},
     },
@@ -132,12 +124,11 @@ export const PersonForm = ({
         ...values,
         address: values?.address?.residence ? values.address : null,
       };
-      if (isEditMode && !!selectedPerson) {
-        mutateEditPerson(
+      if (isEditMode && !!selectedSupplier) {
+        mutateEditSupplier(
           {
-            person: formData as any,
-            personId: selectedPerson?.pkPerson,
-            user_type: personType,
+            supplier: formData as any,
+            supplierId: selectedSupplier?.pkSupplier,
           },
           {
             onSuccess: () => {
@@ -147,13 +138,13 @@ export const PersonForm = ({
             onError: (e: any) => {
               onErrorExtraCallback(
                 e?.response?.data?.message ??
-                  'Ocorreu um erro ao editar funcionário',
+                  'Ocorreu um erro ao editar fornecedor',
               );
             },
           },
         );
       } else {
-        mutateAddPerson(formData as any, {
+        mutateAddSupplier(formData as any, {
           onSuccess: () => {
             resetForm();
             onSuccessExtraCallback('create');
@@ -161,7 +152,7 @@ export const PersonForm = ({
           onError: (e: any) => {
             onErrorExtraCallback(
               e?.response?.data?.message ??
-                'Ocorreu um erro ao criar funcionário',
+                'Ocorreu um erro ao criar fornecedor',
             );
           },
         });
@@ -179,30 +170,23 @@ export const PersonForm = ({
       <ModalContent>
         <ModalHeader>
           {isViewMode
-            ? selectedPerson?.name
+            ? selectedSupplier?.name
             : isEditMode
-            ? `Editar ${
-                personType === UserTypeEnum.CUSTOMER ? 'Cliente' : 'Funcionário'
-              }`
-            : `Novo ${
-                personType === UserTypeEnum.CUSTOMER ? 'Cliente' : 'Funcionário'
-              }`}
+            ? 'Editar Fornecedor'
+            : 'Novo Fornecedor'}
         </ModalHeader>
 
         <ModalCloseButton />
 
         <ModalBody>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing="15px">
+          <SimpleGrid columns={{ base: 1, md: 2 }} spacing="15px">
             <FormControl
               isInvalid={!isViewMode && !!errors?.name}
               isRequired={!isViewMode}
             >
-              <FormLabel>Nome Completo</FormLabel>
+              <FormLabel>Nome</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">
-                  {selectedPerson?.name || '-'} (
-                  {UserTypesMap[selectedPerson?.user?.userType ?? personType]})
-                </Text>
+                <Text fontWeight="900">{selectedSupplier?.name || '-'}</Text>
               ) : (
                 <Input
                   id="name"
@@ -210,7 +194,7 @@ export const PersonForm = ({
                   value={values.name}
                   type="text"
                   autoComplete="none"
-                  placeholder={'Nome e Sobrenome'}
+                  placeholder={'Nome do fornecedor'}
                   onChange={handleChange}
                 />
               )}
@@ -223,24 +207,18 @@ export const PersonForm = ({
             >
               <FormLabel>Email</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">{selectedPerson?.email || '-'}</Text>
+                <Text fontWeight="900">{selectedSupplier?.email || '-'}</Text>
               ) : (
                 <Input
                   id="email"
                   name="email"
                   type="email"
                   value={values.email}
-                  disabled={isEditMode}
                   role="presentation"
                   autoComplete="off"
-                  placeholder={'pessoa@email.com'}
+                  placeholder={'fornecedor@email.com'}
                   onChange={handleChange}
                 />
-              )}
-              {isEditMode && (
-                <FormHelperText color={'orange.500'} fontSize="xs">
-                  Caso queira alterar o email entre em contacto com o suporte!
-                </FormHelperText>
               )}
               <FormErrorMessage>{errors.email}</FormErrorMessage>
             </FormControl>
@@ -248,121 +226,47 @@ export const PersonForm = ({
             <FormControl isInvalid={!isViewMode && !!errors.phone}>
               <FormLabel>Telefone</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">{selectedPerson?.phone || '-'}</Text>
+                <Text fontWeight="900">{selectedSupplier?.phone || '-'}</Text>
               ) : (
                 <Input
                   id="phone"
                   name="phone"
                   type="tel"
                   value={values.phone}
-                  placeholder={'9XX XXX XXX'}
                   onChange={handleChange}
                   minLength={9}
-                  maxLength={9}
+                  maxLength={12}
                 />
               )}
 
               <FormErrorMessage>{errors.phone}</FormErrorMessage>
             </FormControl>
 
-            <FormControl isInvalid={!isViewMode && !!errors.bi && !!touched.bi}>
-              <FormLabel>Bilhete de identidade</FormLabel>
+            <FormControl
+              isInvalid={!isViewMode && !!errors.nif && !!touched.nif}
+            >
+              <FormLabel>NIF</FormLabel>
               {isViewMode ? (
-                <Text fontWeight="900">{selectedPerson?.bi || '-'}</Text>
+                <Text fontWeight="900">{selectedSupplier?.nif || '-'}</Text>
               ) : (
                 <Input
-                  id="bi"
-                  name="bi"
-                  value={values.bi}
-                  placeholder={'05LAXXXXXXXXXXX'}
+                  id="nif"
+                  name="nif"
+                  value={values.nif}
                   onChange={handleChange}
                 />
               )}
 
-              <FormErrorMessage>{errors.bi}</FormErrorMessage>
+              <FormErrorMessage>{errors.nif}</FormErrorMessage>
             </FormControl>
-
-            <FormControl isInvalid={!isViewMode && !!errors.birth_date}>
-              <FormLabel>Data de nascimento</FormLabel>
-              {isViewMode ? (
-                <Text fontWeight="900">
-                  {selectedPerson?.birthDate
-                    ? new Date(selectedPerson?.birthDate).toLocaleDateString(
-                        'pt-PT',
-                      )
-                    : '-'}
-                </Text>
-              ) : (
-                <Input
-                  id="birth_date"
-                  name="birth_date"
-                  type="date"
-                  value={values.birth_date}
-                  placeholder={'dd/mm/aaaa'}
-                  onChange={handleChange}
-                />
-              )}
-              <FormErrorMessage>{errors.birth_date}</FormErrorMessage>
-            </FormControl>
-
-            {!isViewMode && (
-              <FormControl isRequired isInvalid={!!errors?.password}>
-                <FormLabel>Palavra-Passe</FormLabel>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  value={values.password}
-                  placeholder={'********'}
-                  autoComplete="new-password"
-                  onChange={handleChange}
-                />
-                <FormErrorMessage>{errors.password}</FormErrorMessage>
-              </FormControl>
-            )}
-
-            {personType !== UserTypeEnum.CUSTOMER && (
-              <FormControl
-                isRequired={!isViewMode}
-                isInvalid={
-                  !isViewMode && !!errors?.user_type && !!touched?.user_type
-                }
-              >
-                <FormLabel>Tipo</FormLabel>
-                {isViewMode ? (
-                  <Text fontWeight="900">
-                    {selectedPerson?.user?.userType
-                      ? UserTypesMap[selectedPerson?.user?.userType]
-                      : '-'}
-                  </Text>
-                ) : (
-                  <Select
-                    id="user_type"
-                    name="user_type"
-                    value={values?.user_type}
-                    placeholder={'Selecione o tipo de conta'}
-                    onChange={handleChange}
-                  >
-                    {Object.values(UserTypeEnum)
-                      .filter((t) => t !== UserTypeEnum.CUSTOMER)
-                      .map((type) => (
-                        <option key={type} value={type}>
-                          {UserTypesMap[type]}
-                        </option>
-                      ))}
-                  </Select>
-                )}
-                <FormErrorMessage>{errors?.user_type}</FormErrorMessage>
-              </FormControl>
-            )}
 
             {isViewMode && (
               <>
                 <Box>
                   <FormLabel>Data de criação</FormLabel>
                   <Text fontWeight="900">
-                    {selectedPerson?.createdAt
-                      ? new Date(selectedPerson?.createdAt).toLocaleString(
+                    {selectedSupplier?.createdAt
+                      ? new Date(selectedSupplier?.createdAt).toLocaleString(
                           'pt-PT',
                         )
                       : '-'}
@@ -371,8 +275,8 @@ export const PersonForm = ({
                 <Box>
                   <FormLabel>Última actualização</FormLabel>
                   <Text fontWeight="900">
-                    {selectedPerson?.updatedAt
-                      ? new Date(selectedPerson?.updatedAt).toLocaleString(
+                    {selectedSupplier?.updatedAt
+                      ? new Date(selectedSupplier?.updatedAt).toLocaleString(
                           'pt-PT',
                         )
                       : '-'}
@@ -398,14 +302,14 @@ export const PersonForm = ({
               <FormLabel>Designação</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedPerson?.address?.name || '-'}
+                  {selectedSupplier?.address?.name || '-'}
                 </Text>
               ) : (
                 <Input
                   id="address.name"
                   name="address.name"
                   value={values?.address?.name}
-                  placeholder={'ex.: Casa da Vila Alice'}
+                  placeholder={'ex.: Escritório 1'}
                   onChange={handleChange}
                 />
               )}
@@ -422,7 +326,7 @@ export const PersonForm = ({
               <FormLabel>Cidade</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedPerson?.address?.city || '-'}
+                  {selectedSupplier?.address?.city || '-'}
                 </Text>
               ) : (
                 <Select
@@ -452,14 +356,14 @@ export const PersonForm = ({
               <FormLabel>Endereço</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedPerson?.address?.residence || '-'}
+                  {selectedSupplier?.address?.residence || '-'}
                 </Text>
               ) : (
                 <Input
                   id="address.residence"
                   name="address.residence"
                   value={values?.address?.residence}
-                  placeholder={'ex.: Av. Deolinda, Casa 92'}
+                  placeholder={'ex.: Av. Deolinda, Apt. B3'}
                   onChange={handleChange}
                 />
               )}

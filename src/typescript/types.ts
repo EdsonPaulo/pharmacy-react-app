@@ -16,6 +16,17 @@ export interface IAddress {
   updatedAt: string;
 }
 
+export interface ISupplier {
+  pkSupplier: number;
+  name: string;
+  email: string;
+  nif?: string;
+  phone?: string;
+  address?: IAddress;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface IPerson {
   pkPerson: number;
   name: string;
@@ -82,6 +93,20 @@ export interface IOrder {
     }
   >;
   orderDate: string;
+  observation: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface IPurchase {
+  pkPurchase: number;
+  total: number;
+  quantity: number;
+  address: IAddress;
+  supplier: ISupplier;
+  employee: IPerson;
+  product: IProduct;
+  purchaseDate: string;
   observation: string;
   createdAt: string;
   updatedAt: string;

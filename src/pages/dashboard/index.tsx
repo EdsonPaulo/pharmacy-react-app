@@ -178,8 +178,8 @@ export const DashboardPage = () => {
         </GridItem>
 
         <GridItem>
-          <Text fontSize="sm" color="brand.primaryDark" fontWeight="bold">
-            Encomendas
+          <Text fontSize="xs" color="brand.primaryDark" fontWeight="bold">
+            Estatísticas de encomendas
           </Text>
 
           <Box h="100%" w="200px">

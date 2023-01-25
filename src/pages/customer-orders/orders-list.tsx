@@ -19,7 +19,7 @@ import {
 import { useCallback, useRef, useState } from 'react';
 import { FiPlus } from 'react-icons/fi';
 import { useMutation } from 'react-query';
-import { deleteOrder } from '../../services/orders';
+import { cancelOrder } from '../../services/orders';
 import { IOrder } from '../../typescript/types';
 import { OrderItem } from './order-item';
 
@@ -47,8 +47,8 @@ export const OrdersList = ({
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [selectedOrder, setSelectedOrder] = useState<IOrder>();
   const { mutate, isLoading: isDeletting } = useMutation(
-    'delete-order',
-    deleteOrder,
+    'cancel-order',
+    cancelOrder,
   );
 
   const onDelete = useCallback(
@@ -68,7 +68,7 @@ export const OrdersList = ({
             position: 'top-right',
             variant: 'subtle',
             status: 'success',
-            title: 'Venda eliminada com sucesso!',
+            title: 'Compra cancelada com sucesso!',
           });
           onRefetch();
           onClose();
@@ -81,7 +81,7 @@ export const OrdersList = ({
             status: 'error',
             title:
               e?.response?.data?.message ??
-              'Ocorreu um erro ao eliminar venda!',
+              'Ocorreu um erro ao cancelar compra!',
           });
         },
       });
@@ -103,7 +103,7 @@ export const OrdersList = ({
         <Box width="100%">
           <Flex mb={6} justifyContent="space-between" alignItems="center">
             <Heading as="h1" fontSize={18} color="brand.primary">
-              Vendas
+              Minhas Compras
             </Heading>
 
             <Button
@@ -113,7 +113,7 @@ export const OrdersList = ({
               leftIcon={<FiPlus />}
               onClick={onAddNew}
             >
-              Adicionar
+              Nova Compra
             </Button>
           </Flex>
 
@@ -147,11 +147,11 @@ export const OrdersList = ({
         <AlertDialogOverlay>
           <AlertDialogContent>
             <AlertDialogHeader fontSize="lg" fontWeight="bold">
-              Eliminar venda
+              Cancelar compra
             </AlertDialogHeader>
 
             <AlertDialogBody>
-              Deseja eliminar a venda
+              Deseja cancelar a compra
               <b> #0000{selectedOrder?.pkOrder}</b>?
             </AlertDialogBody>
 

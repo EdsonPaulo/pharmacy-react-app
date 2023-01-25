@@ -1,9 +1,12 @@
 import { Box, Flex, Icon, Image, Link, Text } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import { AdminMenu } from './menu-items';
+import { useAuth } from '../../contexts/useAuth';
+import { UserTypeEnum } from '../../typescript/enums';
+import { AdminMenu, CustomerMenu } from './menu-items';
 
 export const SidebarMenu = () => {
+  const { user } = useAuth();
   const { pathname } = useLocation();
 
   return (
@@ -24,7 +27,10 @@ export const SidebarMenu = () => {
           </Link>
         </Flex>
 
-        {AdminMenu.map((item) => (
+        {(user?.userType === UserTypeEnum.CUSTOMER
+          ? CustomerMenu
+          : AdminMenu
+        ).map((item) => (
           <Box key={item.title} mb={12} pl={10}>
             <Text
               mb={3}

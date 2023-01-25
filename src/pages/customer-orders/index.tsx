@@ -1,39 +1,43 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { Box, Modal, ModalOverlay, useDisclosure } from '@chakra-ui/react';
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery } from 'react-query';
-import { getSuppliers } from '../../services/supplier';
-import { ISupplier } from '../../typescript/types';
-import { SupplierForm } from './supplier-form';
-import { SupplierList } from './supplier-list';
+import { useAuth } from '../../contexts/useAuth';
+import { getMyOrders } from '../../services/orders';
+import { IOrder } from '../../typescript/types';
+import { OrdersForm } from './orders-form';
+import { OrdersList } from './orders-list';
 
-export const SuppliersPage = () => {
-  // eslint-disable-next-line @typescript-eslint/promise-function-async
-  const { data, isLoading, refetch } = useQuery('suppliers', () =>
-    getSuppliers(),
+export const CustomerOrdersPage = () => {
+  const { user } = useAuth();
+  const { data, isLoading, refetch } = useQuery(
+    `my-orders-${user.pkUser}`,
+    // eslint-disable-next-line @typescript-eslint/promise-function-async
+    () => getMyOrders(user?.personalInfo?.pkPerson!),
   );
   const { isOpen: isFormOpen, onOpen: openForm, onClose } = useDisclosure();
-  const [selectedSupplier, setSelectedSupplier] = useState<ISupplier>();
+  const [selectedOrder, setSelectedOrder] = useState<IOrder>();
   const [formMode, setFormMode] = useState<'edit' | 'view'>('view');
 
-  const handleAddSupplier = useCallback(() => {
+  const handleAddOrder = useCallback(() => {
     setFormMode('edit');
-    setSelectedSupplier(undefined);
+    setSelectedOrder(undefined);
     openForm();
   }, [openForm]);
 
-  const handleViewSupplier = useCallback(
-    (supplier: ISupplier) => {
-      setSelectedSupplier(supplier);
+  const handleViewOrder = useCallback(
+    (order: IOrder) => {
+      setSelectedOrder(order);
       setFormMode('view');
       openForm();
     },
     [openForm],
   );
 
-  const handleEditSupplier = useCallback(
-    (supplier: ISupplier) => {
+  const handleEditOrder = useCallback(
+    (order: IOrder) => {
+      setSelectedOrder(order);
       setFormMode('edit');
-      setSelectedSupplier(supplier);
       openForm();
     },
     [openForm],
@@ -41,7 +45,7 @@ export const SuppliersPage = () => {
 
   const handleCloseModal = useCallback(() => {
     onClose();
-    setSelectedSupplier(undefined);
+    setSelectedOrder(undefined);
   }, [onClose]);
 
   const handleRefetch = useCallback(() => {
@@ -55,13 +59,13 @@ export const SuppliersPage = () => {
 
   return (
     <Box flex={1} p={10}>
-      <SupplierList
-        suppliers={data}
+      <OrdersList
+        orders={data}
         isEmpty={isEmpty}
         isLoading={isLoading}
-        onAddNew={handleAddSupplier}
-        onView={handleViewSupplier}
-        onEdit={handleEditSupplier}
+        onAddNew={handleAddOrder}
+        onView={handleViewOrder}
+        onEdit={handleEditOrder}
         onRefetch={handleRefetch}
       />
 
@@ -69,13 +73,13 @@ export const SuppliersPage = () => {
         isOpen={isFormOpen}
         onClose={handleCloseModal}
         closeOnOverlayClick={false}
-        size={{ base: 'sm', md: 'lg', lg: '4xl' }}
+        size={{ base: 'sm', md: 'lg', lg: '2xl' }}
       >
         <ModalOverlay />
 
-        <SupplierForm
+        <OrdersForm
           mode={formMode}
-          selectedSupplier={selectedSupplier}
+          selectedOrder={selectedOrder}
           onClose={handleCloseModal}
           onRefetch={handleRefetch}
         />

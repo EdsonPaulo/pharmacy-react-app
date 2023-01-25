@@ -27,11 +27,10 @@ import { postCreateOrder, putEditOrder } from '../../services/orders';
 import { useFormik } from 'formik';
 import { orderSchema } from './orders.helpers';
 import { IOrder } from '../../typescript/types';
-import { getPersons } from '../../services/person';
-import { UserTypeEnum } from '../../typescript/enums';
 import { getProducts } from '../../services/products';
 import { groupedSelectOptions } from '../../helpers/objectTransform';
 import { OrderProductItem } from './order-product-item';
+import { useAuth } from '../../contexts/useAuth';
 
 interface OrdersFormProps {
   mode: 'edit' | 'view';
@@ -46,6 +45,7 @@ export const OrdersForm = ({
   onClose,
   onRefetch,
 }: OrdersFormProps) => {
+  const { user } = useAuth();
   const toast = useToast();
   const { isLoading, mutate: mutateAddOrder } = useMutation(
     'create-order',
@@ -54,11 +54,6 @@ export const OrdersForm = ({
   const { isLoading: isEditting, mutate: mutateEditOrder } = useMutation(
     'edit-order',
     putEditOrder,
-  );
-  const { data: persons, isLoading: isLoadingPersons } = useQuery(
-    'persons-all',
-    // eslint-disable-next-line @typescript-eslint/promise-function-async
-    () => getPersons(),
   );
   const { data: products, isLoading: isLoadingProducts } = useQuery(
     'products',
@@ -81,38 +76,6 @@ export const OrdersForm = ({
         'category',
       ),
     [products],
-  );
-
-  const customerOptions = useMemo(
-    () =>
-      persons
-        ?.filter((p) => p.user?.userType === UserTypeEnum.CUSTOMER)
-        ?.map((p) => ({ value: p.pkPerson, label: p.name })) ?? [],
-    [persons],
-  );
-
-  const employeeOptions = useMemo(
-    () =>
-      persons
-        ?.filter((p) => p.user?.userType !== UserTypeEnum.CUSTOMER)
-        ?.map((p) => ({ value: p.pkPerson, label: p.name })) ?? [],
-    [persons],
-  );
-
-  const getCustomerAddresses = useCallback(
-    (customer?: any) => {
-      const customerId = customer?.value || customer;
-      if (!customerId) return [];
-      return (
-        persons
-          ?.filter((p) => p.pkPerson == customerId && !!p.address?.city)
-          ?.map((p) => ({
-            label: p.address?.name,
-            value: p.address?.pkAddress,
-          })) ?? []
-      );
-    },
-    [persons],
   );
 
   const isViewMode = useMemo(() => mode === 'view', [mode]);
@@ -174,22 +137,10 @@ export const OrdersForm = ({
           quantity: p.productOrder?.quantity,
           category: p.productCategory?.name,
         })) ?? [],
-      fk_customer: selectedOrder?.customer
-        ? {
-            value: selectedOrder?.customer?.pkPerson,
-            label: selectedOrder?.customer?.name,
-          }
-        : null,
       fk_address: selectedOrder?.address
         ? {
             value: selectedOrder?.address?.pkAddress,
             label: selectedOrder?.address?.name,
-          }
-        : null,
-      fk_employee: selectedOrder?.employee
-        ? {
-            value: selectedOrder?.employee?.pkPerson,
-            label: selectedOrder?.employee?.name,
           }
         : null,
     },
@@ -201,8 +152,7 @@ export const OrdersForm = ({
       const formData = {
         ...values,
         order_date: values.order_date || null,
-        fk_customer: values.fk_customer?.value ?? 0,
-        fk_employee: values.fk_employee?.value ?? 0,
+        fk_customer: user?.personalInfo?.pkPerson,
         fk_address: values.fk_address?.value ?? 0,
         products: values?.products?.map((p: any) => ({
           quantity: p.quantity,
@@ -252,10 +202,10 @@ export const OrdersForm = ({
       <ModalContent>
         <ModalHeader mt={4}>
           {isViewMode
-            ? `Venda #0000${selectedOrder?.pkOrder!}`
+            ? `Compra #0000${selectedOrder?.pkOrder!}`
             : isEditMode
-            ? 'Editar Venda'
-            : 'Nova Venda'}
+            ? 'Editar Compra'
+            : 'Nova Compra'}
         </ModalHeader>
         <ModalCloseButton />
 
@@ -264,30 +214,44 @@ export const OrdersForm = ({
             <FormControl
               isRequired={!isViewMode}
               isInvalid={
-                !isViewMode && !!errors?.fk_customer && !!touched?.fk_customer
+                !isViewMode && !!errors?.fk_address && !!touched?.fk_address
               }
             >
-              <FormLabel>Cliente</FormLabel>
+              <FormLabel>Seu Endereço de Entrega</FormLabel>
               {isViewMode ? (
                 <Text fontWeight="900">
-                  {selectedOrder?.customer?.name || '-'}
+                  {selectedOrder?.address
+                    ? `${selectedOrder?.address?.name} - ${selectedOrder?.address?.residence}, ${selectedOrder?.address?.city}`
+                    : '-'}
                 </Text>
               ) : (
                 <Select
-                  id="fk_customer"
-                  name="fk_customer"
+                  id="fk_address"
+                  name="fk_address"
                   isSearchable
-                  value={values.fk_customer}
-                  options={customerOptions as any}
-                  placeholder={'Selecionar cliente'}
-                  isLoading={isLoadingPersons}
+                  value={values.fk_address}
+                  placeholder={'Selecionar enderecço'}
                   onChange={(value) => {
-                    setFieldValue('fk_customer', value);
-                    setFieldValue('fk_address', null);
+                    setFieldValue('fk_address', value);
                   }}
+                  options={
+                    user?.personalInfo?.address?.residence
+                      ? [
+                          {
+                            label: user?.personalInfo?.address?.name,
+                            value: user?.personalInfo?.address?.pkAddress,
+                          },
+                        ]
+                      : []
+                  }
                 />
               )}
-              <FormErrorMessage>{errors.fk_customer}</FormErrorMessage>
+              {!user?.personalInfo?.address?.residence && (
+                <FormHelperText fontSize="xs">
+                  Dete ter um endereço na sua conta
+                </FormHelperText>
+              )}
+              <FormErrorMessage>{errors.fk_address}</FormErrorMessage>
             </FormControl>
 
             <FormControl
@@ -295,7 +259,7 @@ export const OrdersForm = ({
                 !isViewMode && !!errors.order_date && !!touched.order_date
               }
             >
-              <FormLabel>Data da venda</FormLabel>
+              <FormLabel>Data de entrega</FormLabel>
               {isViewMode ? (
                 <Text
                   fontWeight="900"
@@ -323,73 +287,10 @@ export const OrdersForm = ({
               )}
               <FormErrorMessage>{errors.order_date}</FormErrorMessage>
             </FormControl>
-
-            <FormControl
-              isRequired={!isViewMode}
-              isInvalid={
-                !isViewMode && !!errors?.fk_address && !!touched?.fk_address
-              }
-            >
-              <FormLabel>Endereço do Cliente</FormLabel>
-              {isViewMode ? (
-                <Text fontWeight="900">
-                  {selectedOrder?.address
-                    ? `${selectedOrder?.address?.name} - ${selectedOrder?.address?.residence}, ${selectedOrder?.address?.city}`
-                    : '-'}
-                </Text>
-              ) : (
-                <Select
-                  id="fk_address"
-                  name="fk_address"
-                  isSearchable
-                  value={values.fk_address}
-                  options={getCustomerAddresses(values.fk_customer) as any}
-                  placeholder={'Selecionar enderecço'}
-                  isLoading={isLoadingPersons}
-                  onChange={(value) => {
-                    setFieldValue('fk_address', value);
-                  }}
-                />
-              )}
-              {values.fk_customer &&
-                getCustomerAddresses(values.fk_customer).length == 0 && (
-                  <FormHelperText fontSize="xs">
-                    O cliente deve ter um endereço
-                  </FormHelperText>
-                )}
-              <FormErrorMessage>{errors.fk_address}</FormErrorMessage>
-            </FormControl>
-
-            <FormControl
-              isInvalid={
-                !isViewMode && !!errors?.fk_employee && !!touched?.fk_employee
-              }
-            >
-              <FormLabel>Funcionário responsável</FormLabel>
-              {isViewMode ? (
-                <Text fontWeight="900">
-                  {selectedOrder?.employee?.name || '-'}
-                </Text>
-              ) : (
-                <Select
-                  id="fk_employee"
-                  name="fk_employee"
-                  isSearchable
-                  value={values.fk_employee}
-                  options={employeeOptions as any}
-                  placeholder={'Selecionar funcionário'}
-                  isLoading={isLoadingPersons}
-                  onChange={(value) => {
-                    setFieldValue('fk_employee', value);
-                  }}
-                />
-              )}
-              <FormErrorMessage>{errors.fk_employee}</FormErrorMessage>
-            </FormControl>
           </SimpleGrid>
 
           <FormControl
-            mt={6}
+            mt={2}
             isRequired={!isViewMode}
             isInvalid={!isViewMode && !!errors?.products && !!touched?.products}
           >

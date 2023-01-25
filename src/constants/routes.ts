@@ -10,6 +10,9 @@ export const ROUTES = {
   Purchases: '/entradas',
   Users: '/utilizadores',
   Preferences: '/preferencias',
+  Profile: '/conta',
+  StoreFront: '/loja',
+  CustomerOrders: '/pedidos',
 };
 
 export const AUTH_ROUTES = {

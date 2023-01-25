@@ -26,6 +26,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import { useAuth } from '../../contexts/useAuth';
 import { UserTypesMap } from '../../pages/users/users.helpers';
+import { UserTypeEnum } from '../../typescript/enums';
 
 export const HeaderBar = () => {
   const { user, handleLogout } = useAuth();
@@ -85,24 +86,29 @@ export const HeaderBar = () => {
               {user?.email}
             </Text>
 
-            <Button
-              mt={3}
-              size="sm"
-              rounded="3xl"
-              fontSize="xs"
-              variant="outline"
-              rightIcon={<AiOutlineEdit />}
-            >
-              Editar Perfil
-            </Button>
+            <Link as={RouterLink} to={ROUTES.Profile} textDecoration="none">
+              <Button
+                mt={3}
+                size="sm"
+                rounded="3xl"
+                fontSize="xs"
+                variant="outline"
+                rightIcon={<AiOutlineEdit />}
+              >
+                Editar Perfil
+              </Button>
+            </Link>
           </Box>
 
           <MenuDivider />
-          <Link as={RouterLink} to={ROUTES.Preferences} textDecoration="none">
-            <MenuItem icon={<FiSettings size={16} />} fontSize="sm">
-              Configurações
-            </MenuItem>
-          </Link>
+
+          {user.userType !== UserTypeEnum.CUSTOMER && (
+            <Link as={RouterLink} to={ROUTES.Preferences} textDecoration="none">
+              <MenuItem icon={<FiSettings size={16} />} fontSize="sm">
+                Configurações
+              </MenuItem>
+            </Link>
+          )}
 
           <MenuItem
             fontSize="sm"
