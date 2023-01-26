@@ -34,8 +34,7 @@ export const ProductItem = React.memo(function ProductItem({
         w="100%"
         src={product.image || '/default-image.png'}
         height={120}
-        background="gray.100"
-        objectFit="contain"
+        objectFit={'contain'}
       />
 
       <Flex

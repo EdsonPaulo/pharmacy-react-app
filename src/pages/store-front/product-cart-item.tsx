@@ -26,7 +26,6 @@ export const ProductCartItem = React.memo(function ProductCartItem({
           borderRadius="lg"
           src={product.image || '/default-image.png'}
           objectFit="contain"
-          background="gray.100"
         />
 
         <Box flex={1} ml={2} mr={1}>
