@@ -1,4 +1,4 @@
-import { BiReceipt } from 'react-icons/bi';
+import { BiReceipt, BiStore } from 'react-icons/bi';
 import { BsBuilding } from 'react-icons/bs';
 import { FiGrid, FiSettings } from 'react-icons/fi';
 import { GiPill } from 'react-icons/gi';
@@ -15,7 +15,7 @@ export const CustomerMenu = [
       {
         title: 'Loja',
         path: ROUTES.StoreFront,
-        icon: FiGrid,
+        icon: BiStore,
       },
       {
         title: 'Minhas Compras',

@@ -16,6 +16,7 @@ import { PurchasesPage } from '../pages/purchases';
 import { SuppliersPage } from '../pages/suppliers';
 import { ProfilePage } from '../pages/profile';
 import { CustomerOrdersPage } from '../pages/customer-orders';
+import { StoreFrontPage } from '../pages/store-front';
 
 export const AuthenticatedAdminRoutes = () => (
   <Routes>
@@ -35,7 +36,7 @@ export const AuthenticatedAdminRoutes = () => (
 
 export const AuthenticatedCustomerRoutes = () => (
   <Routes>
-    <Route path={ROUTES.StoreFront} element={<ProductsPage />} />
+    <Route path={ROUTES.StoreFront} element={<StoreFrontPage />} />
     <Route path={ROUTES.CustomerOrders} element={<CustomerOrdersPage />} />
     <Route path={ROUTES.Profile} element={<ProfilePage />} />
     <Route path={ROUTES.NotFound} />

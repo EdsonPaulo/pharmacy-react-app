@@ -19,6 +19,7 @@ import {
   useToast,
   Box,
   Textarea,
+  Flex,
 } from '@chakra-ui/react';
 import Select from 'react-select';
 import { useCallback, useMemo } from 'react';
@@ -32,6 +33,7 @@ import { UserTypeEnum } from '../../typescript/enums';
 import { getProducts } from '../../services/products';
 import { groupedSelectOptions } from '../../helpers/objectTransform';
 import { OrderProductItem } from './order-product-item';
+import { formatMoney } from '../../helpers/numberFormat';
 
 interface OrdersFormProps {
   mode: 'edit' | 'view';
@@ -242,6 +244,17 @@ export const OrdersForm = ({
     },
   });
 
+  const formattedTotalPrice = useMemo(() => {
+    let total = 0;
+    values.products?.forEach((item) => {
+      const product = products?.find((p) => p.pkProduct == item?.value);
+      if (product) {
+        total += product.price * item.quantity;
+      }
+    });
+    return formatMoney(total);
+  }, [products, values.products]);
+
   const isAddButtonDisabled = useMemo(
     () => isLoading || isEditting || isViewMode,
     [isEditting, isLoading, isViewMode],
@@ -441,7 +454,18 @@ export const OrdersForm = ({
                     />
                   );
                 })}
-                <Text></Text>
+                <Flex
+                  mt={2}
+                  mx={4}
+                  fontSize="sm"
+                  alignItems="center"
+                  justifyContent="flex-end"
+                >
+                  <Text>Total: </Text>
+                  <Text fontWeight="600" ml={3}>
+                    {formattedTotalPrice}
+                  </Text>
+                </Flex>
               </Box>
             )}
           </FormControl>

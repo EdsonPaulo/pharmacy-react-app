@@ -18,7 +18,9 @@ import {
 import { useFormik } from 'formik';
 import { useMemo } from 'react';
 import { useMutation } from 'react-query';
+import { useNavigate } from 'react-router-dom';
 import AngolaCities from '../../constants/angolan-cities.json';
+import { ROUTES } from '../../constants/routes';
 import { useAuth } from '../../contexts/useAuth';
 import { putEditPerson } from '../../services/person';
 import { personSchema } from '../person/person.helpers';
@@ -27,6 +29,8 @@ import { UserTypesMap } from '../users/users.helpers';
 export const ProfilePage = () => {
   const { user, handleGetUserData } = useAuth();
   const toast = useToast();
+  const navigate = useNavigate();
+
   const { isLoading: isEditting, mutate: mutateEditPerson } = useMutation(
     'edit-my-account',
     putEditPerson,
@@ -287,7 +291,12 @@ export const ProfilePage = () => {
         </SimpleGrid>
 
         <Flex justifyContent="center" mt={14}>
-          <Button mr={8} variant="ghost" sx={{ minW: 170 }} onClick={() => {}}>
+          <Button
+            mr={8}
+            variant="ghost"
+            sx={{ minW: 170 }}
+            onClick={() => navigate(ROUTES.Home)}
+          >
             Voltar
           </Button>
 
