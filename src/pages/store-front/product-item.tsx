@@ -32,6 +32,7 @@ export const ProductItem = React.memo(function ProductItem({
     >
       <Image
         w="100%"
+        p={3}
         src={product.image || '/default-image.png'}
         height={120}
         objectFit={'contain'}
@@ -45,7 +46,7 @@ export const ProductItem = React.memo(function ProductItem({
         justifyContent="space-between"
       >
         <Box>
-          <Text noOfLines={1} color="#3C557A" fontSize="15px" fontWeight="600">
+          <Text noOfLines={2} color="#3C557A" fontSize="13px" fontWeight="600">
             {product.name}
           </Text>
           <Text noOfLines={1} fontSize="12px" color="gray.700">
@@ -53,7 +54,7 @@ export const ProductItem = React.memo(function ProductItem({
           </Text>
         </Box>
 
-        <Text color="#3C557A" fontSize="18px" fontWeight="600">
+        <Text color="#3C557A" fontSize="16px" fontWeight="600">
           {formatMoney(product.price)}
         </Text>
 
