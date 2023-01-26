@@ -22,6 +22,7 @@ export const ProductItem = React.memo(function ProductItem({
     <Flex
       flex={1}
       height={255}
+      maxWidth={200}
       flexDir="column"
       key={product.pkProduct}
       borderRadius={10}
@@ -29,7 +30,13 @@ export const ProductItem = React.memo(function ProductItem({
       overflow="hidden"
       borderColor={quantity > 0 ? '#47C8BB' : 'blackAlpha.300'}
     >
-      <Image w="100%" src={product.image} height={120} objectFit="cover" />
+      <Image
+        w="100%"
+        src={product.image || '/default-image.png'}
+        height={120}
+        background="gray.100"
+        objectFit="contain"
+      />
 
       <Flex
         px={3}
