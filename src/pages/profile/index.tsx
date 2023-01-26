@@ -43,76 +43,69 @@ export const ProfilePage = () => {
     [],
   );
 
-  const {
-    handleSubmit,
-    isValid,
-    errors,
-    touched,
-    handleChange,
-    resetForm,
-    values,
-  } = useFormik({
-    validationSchema: personSchema,
-    enableReinitialize: true,
-    validateOnMount: true,
-    validateOnChange: true,
-    initialValues: {
-      name: user?.personalInfo?.name ?? '',
-      email: user?.personalInfo?.email ?? '',
-      bi: user?.personalInfo?.bi ?? '',
-      birth_date: user?.personalInfo?.birthDate?.split?.('T')?.[0] ?? '',
-      phone: user?.personalInfo?.phone ?? '',
-      password: '#Abc123456',
-      user_type: user?.userType,
-      address: user?.personalInfo?.address
-        ? {
-            name: user?.personalInfo?.address?.name ?? '',
-            city: user?.personalInfo?.address?.city ?? '',
-            residence: user?.personalInfo?.address?.residence ?? '',
-          }
-        : {},
-    },
-    onSubmit: (values) => {
-      const formData = {
-        ...values,
-        password: undefined,
-        birth_date: values.birth_date || undefined,
-        address: values?.address?.residence ? values.address : null,
-      };
+  const { handleSubmit, isValid, errors, touched, handleChange, values } =
+    useFormik({
+      validationSchema: personSchema,
+      enableReinitialize: true,
+      validateOnMount: true,
+      validateOnChange: true,
+      initialValues: {
+        name: user?.personalInfo?.name ?? '',
+        email: user?.personalInfo?.email ?? '',
+        bi: user?.personalInfo?.bi ?? '',
+        birth_date: user?.personalInfo?.birthDate?.split?.('T')?.[0] ?? '',
+        phone: user?.personalInfo?.phone ?? '',
+        password: '#Abc123456',
+        user_type: user?.userType,
+        address: user?.personalInfo?.address
+          ? {
+              name: user?.personalInfo?.address?.name ?? '',
+              city: user?.personalInfo?.address?.city ?? '',
+              residence: user?.personalInfo?.address?.residence ?? '',
+            }
+          : {},
+      },
+      onSubmit: (values) => {
+        const formData = {
+          ...values,
+          password: undefined,
+          birth_date: values.birth_date || undefined,
+          address: values?.address?.residence ? values.address : null,
+        };
 
-      mutateEditPerson(
-        {
-          person: formData as any,
-          personId: user?.personalInfo?.pkPerson,
-          user_type: user?.userType,
-        } as any,
-        {
-          onSuccess: () => {
-            handleGetUserData();
-            toast({
-              duration: 2000,
-              position: 'top-right',
-              variant: 'subtle',
-              status: 'success',
-              title: 'Dados salvos com sucesso!',
-            });
-            resetForm();
+        mutateEditPerson(
+          {
+            person: formData as any,
+            personId: user?.personalInfo?.pkPerson,
+            user_type: user?.userType,
+          } as any,
+          {
+            onSuccess: () => {
+              handleGetUserData();
+              toast({
+                duration: 2000,
+                position: 'top-right',
+                variant: 'subtle',
+                status: 'success',
+                title: 'Dados salvos com sucesso!',
+              });
+              window.scrollTo({ top: 0, left: 0, behavior: 'smooth' });
+            },
+            onError: (e: any) => {
+              toast({
+                duration: 3000,
+                position: 'top-right',
+                variant: 'subtle',
+                status: 'error',
+                title:
+                  e?.response?.data?.message ??
+                  'Ocorreu um erro ao editar perfil',
+              });
+            },
           },
-          onError: (e: any) => {
-            toast({
-              duration: 3000,
-              position: 'top-right',
-              variant: 'subtle',
-              status: 'error',
-              title:
-                e?.response?.data?.message ??
-                'Ocorreu um erro ao editar perfil',
-            });
-          },
-        },
-      );
-    },
-  });
+        );
+      },
+    });
 
   const isAddButtonDisabled = useMemo(
     () => isEditting || !isValid,
