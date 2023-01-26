@@ -23,6 +23,7 @@ import AngolaCities from '../../constants/angolan-cities.json';
 import { ROUTES } from '../../constants/routes';
 import { useAuth } from '../../contexts/useAuth';
 import { putEditPerson } from '../../services/person';
+import { UserTypeEnum } from '../../typescript/enums';
 import { personSchema } from '../person/person.helpers';
 import { UserTypesMap } from '../users/users.helpers';
 
@@ -288,7 +289,13 @@ export const ProfilePage = () => {
             mr={8}
             variant="ghost"
             sx={{ minW: 170 }}
-            onClick={() => navigate(ROUTES.Home)}
+            onClick={() =>
+              navigate(
+                user?.userType === UserTypeEnum.CUSTOMER
+                  ? ROUTES.StoreFront
+                  : ROUTES.Dashboard,
+              )
+            }
           >
             Voltar
           </Button>
